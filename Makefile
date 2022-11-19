@@ -6,7 +6,7 @@
 #    By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/05 21:09:19 by eunjilee          #+#    #+#              #
-#    Updated: 2022/11/19 20:01:49 by eunjilee         ###   ########.fr        #
+#    Updated: 2022/11/20 01:32:04 by eunjilee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,6 +24,7 @@ LIBFT_DIR = libft/
 MINISHELL = main.c \
 			builtins.c \
 			utils.c \
+			errors.c \
 
 SRCS = $(addprefix srcs/, $(MINISHELL))
 OBJS = $(SRCS:%.c=%.o)

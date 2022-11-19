@@ -29,5 +29,6 @@ typedef struct s_cmd_info {
 void	sig_handler(int signal);
 void	signal_on(void);
 
-int		chk_fork_err(int fd);
+int		chk_fork_err(int pid);
+int		chk_fd_err(int fd);
 #endif

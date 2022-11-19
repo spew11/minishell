@@ -1,21 +1,5 @@
 #include "minishell.h"
 
-void chk_fork_err(int pid) {
-	if (pid < 0) {
-		ft_putstr_fd("Faild to for child process\n", 2);
-		exit(1);
-	}
-	return ;
-}
-
-void chk_fd_err(int fd) {
-	if (fd < 0) {
-		ft_put_str("no such file or directory\n", 2);
-		exit(1);
-	}
-	return ;
-}
-
 int run_cmd(t_cmd_info *cmd_info) {
 	/*if in_str == 0, doesn't set input*/
 	if (!(cmd_info->in_str)) {
@@ -48,7 +32,10 @@ int run_cmd(t_cmd_info *cmd_info) {
 			dup2(fd[1], 1);
 			//run_func(cmd_info->argc, cmd_info->argv);
 		}
-		
+		/*run_func(cmd_info->argc, cmd_info->argv);
+		 if (*(cmd_info + 1)) {
+			run_cmd(cmd_info + 1);
+		}*/
 	}
 	return 0;
 }
