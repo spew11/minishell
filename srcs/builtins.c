@@ -1,13 +1,11 @@
 #include "minishell.h"
 
-int echo(char *cmd_info[]) {
-	int option_flag = 0;
-	int i = 1;
-	if (strcmp(cmd_info[i], "-n") == 0) {
-		option_flag = 1;
-		i++;
+int echo(char *argv[])
+{
+	int opt_f = 0;
+
+	if (cmd_info->argc == 1) {
+		printf("\n");
 	}
-
-
 	return (0);
 }

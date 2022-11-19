@@ -1,8 +1,9 @@
 #include "minishell.h"
 
-int main(void) {
+int main(int argc, char *argv[]) {
 	char *line;
 	struct termios term;
+	t_cmd_info *cmd_infos;
 	tcgetattr(0, &term);
     term.c_lflag &= ~(ECHOCTL);
     tcsetattr(0, TCSANOW, &term);
@@ -23,6 +24,9 @@ int main(void) {
 				break;
 			}
 			add_history(line);
+			/* cmd_infos = parsing line&initiate_infos(cmd_infos);
+			 * run_cmds(cmd_infos);
+			 */
 			printf("%s\n", line);
 			free(line);
 		}
