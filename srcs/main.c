@@ -34,8 +34,8 @@
 //test main code
 int main(int argc, char *argv[], char *envp[]) {
 	t_cmd_info **cmd_infos;
-
-	cmd_infos = (t_cmd_info **)malloc(sizeof(t_cmd_info*) * 3);
+	// Redirection test code [echo happy > out1 > out2]
+	/*cmd_infos = (t_cmd_info **)malloc(sizeof(t_cmd_info*) * 3);
 	for (int i = 0; i < 2; i++) {
 		cmd_infos[i] = (t_cmd_info *)malloc(sizeof(t_cmd_info));
 	}
@@ -53,5 +53,56 @@ int main(int argc, char *argv[], char *envp[]) {
 	cmd_infos[1]->in_str = "out1";
 	cmd_infos[1]->out_type = FILE_END;
 	cmd_infos[1]->out_str = "out2";
+	run_cmds(cmd_infos, envp);*/
+
+	//pipe test code [cat < input | grep "hansu" > out]
+	/*
+	cmd_infos = (t_cmd_info **)malloc(sizeof(t_cmd_info*) * 3);
+	for (int i = 0; i < 2; i++) {
+		cmd_infos[i] = (t_cmd_info *)malloc(sizeof(t_cmd_info));
+	}
+	cmd_infos[2] = 0;
+	cmd_infos[0]->argv = ft_split("cat", ' ');
+	cmd_infos[0]->argc = 1;
+	cmd_infos[0]->in_type = FILE;
+	cmd_infos[0]->in_str = "input";
+	cmd_infos[0]->out_type = PIPE;
+	cmd_infos[0]->out_str = 0;
+	
+	cmd_infos[1]->argv = ft_split("grep hansu", ' ');
+	cmd_infos[1]->argc = 2;
+	cmd_infos[1]->in_type = PIPE;
+	cmd_infos[1]->in_str = 0;
+	cmd_infos[1]->out_type = FILE;
+	cmd_infos[1]->out_str = "out";
+	run_cmds(cmd_infos, envp);
+	*/
+	
+	//pipe test code [cat < input | grep hansu | wc -l >> out]
+	cmd_infos = (t_cmd_info **)malloc(sizeof(t_cmd_info*) * 4);
+	for (int i = 0; i < 3; i++) {
+		cmd_infos[i] = (t_cmd_info *)malloc(sizeof(t_cmd_info));
+	}
+	cmd_infos[3] = 0;
+	cmd_infos[0]->argv = ft_split("cat", ' ');
+	cmd_infos[0]->argc = 1;
+	cmd_infos[0]->in_type = FILE;
+	cmd_infos[0]->in_str = "input";
+	cmd_infos[0]->out_type = PIPE;
+	cmd_infos[0]->out_str = 0;
+	
+	cmd_infos[1]->argv = ft_split("grep hansu", ' ');
+	cmd_infos[1]->argc = 2;
+	cmd_infos[1]->in_type = PIPE;
+	cmd_infos[1]->in_str = 0;
+	cmd_infos[1]->out_type = PIPE;
+	cmd_infos[1]->out_str = 0;
+	
+	cmd_infos[2]->argv = ft_split("wc -l", ' ');
+	cmd_infos[2]->argc = 2;
+	cmd_infos[2]->in_type = PIPE;
+	cmd_infos[2]->in_str = 0;
+	cmd_infos[2]->out_type = FILE_END;
+	cmd_infos[2]->out_str = "out";
 	run_cmds(cmd_infos, envp);
 }

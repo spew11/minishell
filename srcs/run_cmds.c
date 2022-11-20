@@ -14,9 +14,6 @@ static int run_cmd(t_cmd_info **cmd_infos, int idx, char *envp[]) {
 	int out_fd = 0;
 
 	if (cmd_infos[idx]->in_str) {
-		/*test code
-		int tmp_fd = open("tmp", O_WRONLY | O_APPEND | O_CREAT, 0644);
-		dprintf(tmp_fd, "%s\n", cmd_infos[idx]->in_str);*/
 		if (ft_access(cmd_infos[idx]->in_str) == -1) {
 			ft_putstr_fd("No such file or derectory\n", 2);
 			exit(1);
@@ -53,15 +50,20 @@ static int run_cmd(t_cmd_info **cmd_infos, int idx, char *envp[]) {
 			run_func(cmd_infos[idx]->argc, cmd_infos[idx]->argv, envp);
 		}
 	}
-	int pid = fork();
-	chk_fork_err(pid);
-	if (pid == 0) {
-		run_func(cmd_infos[idx]->argc, cmd_infos[idx]->argv, envp);
+	if (cmd_infos[idx + 1]) {
+		int pid = fork();
+		chk_fork_err(pid);
+		if (pid == 0) {
+			run_func(cmd_infos[idx]->argc, cmd_infos[idx]->argv, envp);
+		}
+		else {
+			if (cmd_infos[idx + 1]) {
+				run_cmd(cmd_infos, idx + 1, envp);
+			}
+		}
 	}
 	else {
-		if (cmd_infos[idx + 1]) {
-			run_cmd(cmd_infos, idx + 1, envp);
-		}
+		run_func(cmd_infos[idx]->argc, cmd_infos[idx]->argv, envp);
 	}
 	return 0;
 }
