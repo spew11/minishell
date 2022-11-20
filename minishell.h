@@ -9,6 +9,7 @@
 # include <termios.h>
 # include <sys/types.h>
 # include <sys/stat.h>
+# include <sys/wait.h>
 # include <unistd.h>
 # include <fcntl.h>
 //# include <sys/fcntl.h>
@@ -28,6 +29,7 @@ typedef struct s_cmd_info {
 	char	*out_str;
 }				t_cmd_info;
 
+
 void	sig_handler(int signal);
 void	signal_on(void);
 
@@ -36,4 +38,5 @@ void		chk_fd_err(int fd);
 
 void ft_execve(char *argv[], char *envp[]);
 int	ft_access(const char *pathname);
+int	run_cmds(t_cmd_info **cmd_infos, char *envp[]);
 #endif

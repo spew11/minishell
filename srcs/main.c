@@ -1,6 +1,5 @@
 #include "minishell.h"
-/*
-int main(int argc, char *argv[], char *envp[]) {
+/*int main(int argc, char *argv[], char *envp[]) {
 	char *line;
 	struct termios term;
 	t_cmd_info *cmd_infos;
@@ -31,12 +30,28 @@ int main(int argc, char *argv[], char *envp[]) {
 		}
 	}
 	return (0);
-}
-*/
-
+}*/
+//test main code
 int main(int argc, char *argv[], char *envp[]) {
-	ft_execve(argv + 1, envp);
-	return (0);
+	t_cmd_info **cmd_infos;
+
+	cmd_infos = (t_cmd_info **)malloc(sizeof(t_cmd_info*) * 3);
+	for (int i = 0; i < 2; i++) {
+		cmd_infos[i] = (t_cmd_info *)malloc(sizeof(t_cmd_info));
+	}
+	cmd_infos[2] = 0;
+	cmd_infos[0]->argv = ft_split("echo happy", ' ');
+	cmd_infos[0]->argc = 1;
+	cmd_infos[0]->in_type = 0;
+	cmd_infos[0]->in_str = 0;
+	cmd_infos[0]->out_type = FILE_END;
+	cmd_infos[0]->out_str = "out1";
+	
+	cmd_infos[1]->argv = 0;
+	cmd_infos[1]->argc = 0;
+	cmd_infos[1]->in_type = FILE;
+	cmd_infos[1]->in_str = "out1";
+	cmd_infos[1]->out_type = FILE_END;
+	cmd_infos[1]->out_str = "out2";
+	run_cmds(cmd_infos, envp);
 }
-
-
