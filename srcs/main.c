@@ -1,5 +1,5 @@
 #include "minishell.h"
-/*
+
 int main(int argc, char *argv[], char *envp[]) {
 	char *line;
 	struct termios term;
@@ -24,16 +24,27 @@ int main(int argc, char *argv[], char *envp[]) {
 				break;
 			}
 			add_history(line);
-			* cmd_infos = parsing line&initiate_infos(cmd_infos);
-			* run_cmds(cmd_infos);
-			printf("%s\n", line);
-			echo();
+			//cmd_infos = parsing line&initiate_infos(cmd_infos);
+			//run_cmds(cmd_infos);
+			char **strs = ft_split(line, ' ');
+			if (ft_strncmp(strs[0], "cd", 2) == 0) {
+				cd(2, strs); //cd는 fork()해서 하면 안됨(binary file이 아님)
+			}
+			else {
+				int pid = fork();
+				chk_fork_err(pid);
+				if (pid == 0) {
+					ft_execve(strs, envp);
+				}
+				else {
+					wait(0);
+				}
+			}
 			free(line);
 		}
 	}
 	return (0);
 }
-*/
 
 //test main code
 /*int main(int argc, char *argv[], char *envp[]) {
@@ -108,18 +119,3 @@ int main(int argc, char *argv[], char *envp[]) {
 	cmd_infos[2]->out_str = "out";
 	run_cmds(cmd_infos, envp);
 }*/
-
-int main(void) {
-/*	char **argv = ft_split("echo $changmo eunji $eui hansu thank $HOME you $ha", ' ');
-	int argc = 9;
-	echo(argc, argv);
-	argv = ft_split("echo -n beautiful $HOME", ' ');
-	echo(3, argv);
-	return (0);*/
-	//cd(2, ft_split("cd ../../", ' '));
-	//cd(2, ft_split("cd ~", ' '));
-	cd(2, ft_split("cd /happy",  ' '));
-	//cd(2, ft_split("cd ~/wd/42Seoul/42cursus/", ' '));
-//	cd(1, ft_split("cd", ' '));
-	return (0);
-}
