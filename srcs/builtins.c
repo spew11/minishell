@@ -30,3 +30,33 @@ int echo(int argc, char *argv[])
 	}
 	return (0);
 }
+
+int cd(int argc, char *argv[]) {
+	char *home_path = getenv("HOME");
+
+	if (argc > 2) {
+		ft_putstr_fd("too many arguments\n", 2);
+		return (1);
+	}
+	if (argc == 1) {
+		chdir(home_path);
+	}
+	else {
+		char **paths = ft_split(argv[1], '/');
+		int i = 0;
+		while (paths[i]) {
+			if (ft_strlen(paths[i]) == 1 && paths[i][0] == '~') {
+				chdir(home_path);
+			}
+			else {
+				if (ft_access(paths[i]) < 0) {
+					ft_putstr_fd("No such file or directory\n", 2);
+					return (1);
+				}
+				chdir(paths[i]);
+			}
+			i++;
+		}
+	}
+	return (0);
+}

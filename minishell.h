@@ -20,6 +20,8 @@
 # define FILE_END 4 // >>
 # define STDOUT 5
 
+int exit_status;
+
 typedef struct s_cmd_info {
 	char	**argv;
 	int		argc;
@@ -41,4 +43,5 @@ int	ft_access(const char *pathname);
 int	run_cmds(t_cmd_info **cmd_infos, char *envp[]);
 
 int echo(int argc, char *argv[]);
+int cd(int argc, char *argv[]);
 #endif
