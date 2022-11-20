@@ -39,4 +39,6 @@ void		chk_fd_err(int fd);
 void ft_execve(char *argv[], char *envp[]);
 int	ft_access(const char *pathname);
 int	run_cmds(t_cmd_info **cmd_infos, char *envp[]);
+
+int echo(int argc, char *argv[]);
 #endif

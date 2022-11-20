@@ -1,5 +1,6 @@
 #include "minishell.h"
-/*int main(int argc, char *argv[], char *envp[]) {
+/*
+int main(int argc, char *argv[], char *envp[]) {
 	char *line;
 	struct termios term;
 	t_cmd_info *cmd_infos;
@@ -26,16 +27,19 @@
 			* cmd_infos = parsing line&initiate_infos(cmd_infos);
 			* run_cmds(cmd_infos);
 			printf("%s\n", line);
+			echo();
 			free(line);
 		}
 	}
 	return (0);
-}*/
+}
+*/
+
 //test main code
-int main(int argc, char *argv[], char *envp[]) {
+/*int main(int argc, char *argv[], char *envp[]) {
 	t_cmd_info **cmd_infos;
 	// Redirection test code [echo happy > out1 > out2]
-	/*cmd_infos = (t_cmd_info **)malloc(sizeof(t_cmd_info*) * 3);
+	cmd_infos = (t_cmd_info **)malloc(sizeof(t_cmd_info*) * 3);
 	for (int i = 0; i < 2; i++) {
 		cmd_infos[i] = (t_cmd_info *)malloc(sizeof(t_cmd_info));
 	}
@@ -53,10 +57,9 @@ int main(int argc, char *argv[], char *envp[]) {
 	cmd_infos[1]->in_str = "out1";
 	cmd_infos[1]->out_type = FILE_END;
 	cmd_infos[1]->out_str = "out2";
-	run_cmds(cmd_infos, envp);*/
+	run_cmds(cmd_infos, envp);
 
 	//pipe test code [cat < input | grep "hansu" > out]
-	/*
 	cmd_infos = (t_cmd_info **)malloc(sizeof(t_cmd_info*) * 3);
 	for (int i = 0; i < 2; i++) {
 		cmd_infos[i] = (t_cmd_info *)malloc(sizeof(t_cmd_info));
@@ -76,7 +79,6 @@ int main(int argc, char *argv[], char *envp[]) {
 	cmd_infos[1]->out_type = FILE;
 	cmd_infos[1]->out_str = "out";
 	run_cmds(cmd_infos, envp);
-	*/
 	
 	//pipe test code [cat < input | grep hansu | wc -l >> out]
 	cmd_infos = (t_cmd_info **)malloc(sizeof(t_cmd_info*) * 4);
@@ -105,4 +107,13 @@ int main(int argc, char *argv[], char *envp[]) {
 	cmd_infos[2]->out_type = FILE_END;
 	cmd_infos[2]->out_str = "out";
 	run_cmds(cmd_infos, envp);
+}*/
+
+int main(void) {
+	char **argv = ft_split("echo $changmo eunji $eui hansu thank $HOME you $ha", ' ');
+	int argc = 9;
+	echo(argc, argv);
+	argv = ft_split("echo -n beautiful $HOME", ' ');
+	echo(3, argv);
+	return (0);
 }
