@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int main(int argc, char *argv[], char *envp[]) {
+/*int main(int argc, char *argv[], char *envp[]) {
 	char *line;
 	struct termios term;
 	t_cmd_info *cmd_infos;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[], char *envp[]) {
 		}
 	}
 	return (0);
-}
+}*/
 
 //test main code
 /*int main(int argc, char *argv[], char *envp[]) {
@@ -119,3 +119,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	cmd_infos[2]->out_str = "out";
 	run_cmds(cmd_infos, envp);
 }*/
+
+int main(int argc, char *argv[], char *envp[]) {
+	pwd();
+}

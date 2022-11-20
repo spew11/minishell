@@ -60,3 +60,15 @@ int cd(int argc, char *argv[]) {
 	}
 	return (0);
 }
+
+int pwd(void) {
+	//linux path maximum length is 4096
+	char buf[4096];
+	getcwd(buf, 4096);
+	printf("%s\n", buf);
+	return (0);
+}
+
+int export(int argc, char *argv[]) {
+	return (0);
+}
