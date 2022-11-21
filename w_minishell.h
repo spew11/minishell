@@ -23,6 +23,9 @@ typedef struct s_cmd_info {
 	t_redir *redir;
 } t_cmd_info;
 
+t_cmd_info	*parse_line(char *line, int *pipe_num, char *envp[]);
+//temp
+void print(void *ptr);
 /*
 
 echo happy > out1 > out2
@@ -48,3 +51,6 @@ cat < file1 > file2 << eof1 | cat -e >> out
 ]
 
 */
+
+// cat -b-n<out<$out -e|cat|cat -e>exp 
+// -> [cat, -b-n, <out, <$out, -e, |, cat, |, cat, -e, >exp]
