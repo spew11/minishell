@@ -23,13 +23,12 @@
 int exit_status;
 
 typedef struct s_var_lst {
-	char **var_val;
+	char *var;
+	char *val;
 	struct s_var_lst *next;
 }				t_var_lst;
 
 typedef struct s_cmd_info {
-	t_var_lst *env_lst;
-	t_var_lst *export_lst;
 	char	**argv;
 	int		argc;
 	int		in_type;
@@ -51,7 +50,11 @@ int	run_cmds(t_cmd_info **cmd_infos, char *envp[]);
 
 int echo(int argc, char *argv[]);
 int cd(int argc, char *argv[]);
-int init_var_lst(t_var_lst *var_lst, char *envp[]);
+//int init_var_lst(t_var_lst *var_lst, char *envp[]);
+t_var_lst *init_var_lst(char *envp[]);
 void print_var_lst(t_var_lst *var_lst);
 char **ft_slice(char *str, char sep);
+int export(int argc, char *argv[], t_var_lst *export_lst, t_var_lst *env_lst);
+void sort_var_lst(t_var_lst *var_lst);
+void add_var_lst(t_var_lst *var_lst, char *var, char *val);
 #endif

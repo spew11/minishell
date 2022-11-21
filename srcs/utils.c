@@ -12,6 +12,9 @@ char **ft_slice(char *str, char sep) {
 		}
 		i++;
 	}
+	if (i == str_len) {
+		return (0);
+	}
 	strs = (char **)malloc(sizeof(char *) * 3);
 	strs[2] = 0;
 	strs[0] = (char *)malloc(sizeof(char) * (sep_idx));
