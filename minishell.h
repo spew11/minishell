@@ -22,7 +22,14 @@
 
 int exit_status;
 
+typedef struct s_env_lst {
+	char **env_val;
+	struct s_env_lst *next;
+}				t_env_lst;
+
 typedef struct s_cmd_info {
+	t_env_lst *env_lst;
+	t_env_lst *export_lst;
 	char	**argv;
 	int		argc;
 	int		in_type;
@@ -44,4 +51,6 @@ int	run_cmds(t_cmd_info **cmd_infos, char *envp[]);
 
 int echo(int argc, char *argv[]);
 int cd(int argc, char *argv[]);
+int init_env_lst(t_env_lst *env_lst, char *envp[]);
+char **ft_slice(char *str, char sep);
 #endif

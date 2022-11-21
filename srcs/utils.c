@@ -1,5 +1,26 @@
 #include "minishell.h"
 
+char **ft_slice(char *str, char sep) {
+	char **strs;
+	int i = 0;
+	int sep_idx = 0;
+	size_t str_len = ft_strlen(str);
+	while (str[i]) {
+		if (str[i] == sep) {
+			sep_idx = i;
+			break;
+		}
+		i++;
+	}
+	strs = (char **)malloc(sizeof(char *) * 3);
+	strs[2] = 0;
+	strs[0] = (char *)malloc(sizeof(char) * (sep_idx));
+	strs[1] = (char *)malloc(sizeof(char) * (str_len - sep_idx + 1));
+	ft_strlcpy(strs[0], str, sep_idx + 1);
+	ft_strlcpy(strs[1], str + sep_idx + 1, str_len - sep_idx);
+	return (strs);
+}
+
 int ft_access(const char *pathname) {
 	struct stat statbuf;
 	if (stat(pathname, &statbuf) == 0) {
