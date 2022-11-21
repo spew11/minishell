@@ -55,7 +55,10 @@ int main(int argc, char *argv[], char *envp[]) {
 	t_var_lst *env_lst = init_var_lst(envp);
 	export(2, ft_split("export Eunji=", ' '), export_lst, env_lst);
 	export(2, ft_split("export hansu=eunji", ' '), export_lst, env_lst);
-	export(4, ft_split("export apple grape=mine $hap=do", ' '), export_lst, env_lst);
+	export(4, ft_split("export apple grape=mine $hell", ' '), export_lst, env_lst);
+	export(4, ft_split("export apple=banana grape=mine $hell", ' '), export_lst, env_lst);
+	export(4, ft_split("export apple grape=mine $hell", ' '), export_lst, env_lst);
 	print_var_lst(export_lst);
+	//print_var_lst(env_lst);
 	return (0);
 }

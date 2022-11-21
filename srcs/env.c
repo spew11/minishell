@@ -6,7 +6,19 @@ void add_var_lst(t_var_lst *var_lst, char *var, char *val) {
 
 	now = var_lst;
 	while (now->next) {
+		if (ft_strncmp(now->var, var, -1) == 0) {
+			if (val) {
+				now->val = val;
+			}
+			return ;
+		}
 		now = now->next;
+	}
+	if (ft_strncmp(now->var, var, -1) == 0) {
+		if (val) {
+			now->val = val;
+		}
+		return ;
 	}
 	now->next = (t_var_lst *)malloc(sizeof(t_var_lst) * 1);
 	now->next->var = var;

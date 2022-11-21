@@ -69,46 +69,6 @@ int pwd(void) {
 	return (0);
 }
 
-/*static char **get_var_val(char *str){
-	char **strs = ft_slice(str, '=');
-	char *var;
-	char *val;
-	int i;
-	if (strs) { //export, env 둘다 등록됨
-		var = strs[0];
-		val = strs[1];
-		if (var[0] == 0) { //=happy가 들어온 경우
-			return (0);
-		}
-		if (val[1] == 0) { //happy=가 들어온 경우
-			strs[1] = "\"\"";
-		}
-		i = 0;
-		while (var[i]) {
-			if (!ft_isalnum(var[i])) {
-				ft_putstr_fd("not a valid identifier\n", 2);
-				return (0);
-			}
-			i++;
-		}
-	}
-	else { //export에는 등록되지만 env에는 등록안됨
-		i = 0;
-		while (str[i]) {
-			if (!ft_isalnum(str[i])) {
-				ft_putstr_fd("not a valid identifier\n", 2);
-				return (0);
-			}
-			i++;
-		}
-		strs = (char **)malloc(sizeof(char *) * 3);
-		strs[0] = str;
-		strs[1] = 0;
-		strs[2] = 0;
-	}
-	return (strs);
-}*/
-
 static char **get_var_val(char *str){
 	char **strs = ft_slice(str, '=');
 	char *var = strs[0];
@@ -154,7 +114,7 @@ int export(int argc, char *argv[], t_var_lst *export_lst, t_var_lst *env_lst) {
 						ft_putstr_fd("not a valid identifier\n", 2);
 						return (0);
 					}
-					i++;
+					j++;
 				}
 				add_var_lst(export_lst, argv[i], 0);
 			}
