@@ -47,7 +47,7 @@
 
 
 // cat -e < infile << infile2 > outfile | cat -e >> outfile2
-
+//  cat -e<infile<<infile2>outfile|cat -e>>outfile2
 
 
 int main(int argc, char *argv[], char *envp[])

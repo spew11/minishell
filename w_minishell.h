@@ -20,12 +20,19 @@ typedef struct s_redir {
 typedef struct s_cmd_info {
 	int		argc;
 	char	**argv;
+	int		redir_num;
 	t_redir *redir;
 } t_cmd_info;
+
+enum	e_opt {
+	ARGC,
+	REDIR,
+};
 
 t_cmd_info	*parse_line(char *line, int *pipe_num, char *envp[]);
 //temp
 void print(void *ptr);
+void	print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num);
 /*
 
 echo happy > out1 > out2
@@ -53,4 +60,4 @@ cat < file1 > file2 << eof1 | cat -e >> out
 */
 
 // cat -b-n<out<$out -e|cat|cat -e>exp 
-// -> [cat, -b-n, <out, <$out, -e, |, cat, |, cat, -e, >exp]
+// -> [cat, -b-n, <, out, <, $out, -e, |, cat, |, cat, -e, >, exp]
