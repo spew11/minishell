@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int echo(int argc, char *argv[])
+int echo(int argc, char *argv[], t_var_lst *env_lst)
 {
 	char *str;
 	int opt_f = 0;
@@ -13,7 +13,7 @@ int echo(int argc, char *argv[])
 	while (i < argc) {
 		str = argv[i];
 		if (ft_strlen(argv[i]) > 1 && argv[i][0] == '$') {
-			str = getenv(argv[i] + 1);
+			str = ft_getenv(env_lst, argv[i] + 1);
 			if (str == 0) {
 				i++;
 				continue;
@@ -31,8 +31,8 @@ int echo(int argc, char *argv[])
 	return (0);
 }
 
-int cd(int argc, char *argv[]) {
-	char *home_path = getenv("HOME");
+int cd(int argc, char *argv[], t_var_lst *env_lst) {
+	char *home_path = ft_getenv(env_lst, "HOME");
 
 	if (argc > 2) {
 		ft_putstr_fd("too many arguments\n", 2);
@@ -109,18 +109,53 @@ int export(int argc, char *argv[], t_var_lst *export_lst, t_var_lst *env_lst) {
 			}
 			else {
 				int j = 0;
+				int err_f = 0;
 				while (argv[i][j]) {
 					if (!ft_isalnum(argv[i][j])) {
 						ft_putstr_fd("not a valid identifier\n", 2);
-						return (0);
+						err_f = 1;
+						break;
 					}
 					j++;
 				}
-				add_var_lst(export_lst, argv[i], 0);
+				if (err_f == 0) {
+					add_var_lst(export_lst, argv[i], 0);
+				}
 			}
 			i++;
 		}
 		sort_var_lst(export_lst);
 	}
+	return (0);
+}
+
+int unset(int argc, char *argv[], t_var_lst *export_lst, t_var_lst *env_lst) {
+	int i = 1;
+	while (i < argc) {
+		int j = 0;
+		int err_f = 0;
+		while (argv[i][j]) {
+			if (!ft_isalnum(argv[i][j])) {
+				ft_putstr_fd("not a valid identifier\n", 2);
+				err_f = 1;
+				break;
+			}
+			j++;
+		}
+		if (err_f == 0) {
+			remove_var_lst(export_lst, argv[i]);
+			remove_var_lst(env_lst, argv[i]);
+		}
+		i++;
+	}
+	return (0);
+}
+
+int env(int argc, char *argv[], t_var_lst *env_lst) {
+	if (argc != 1) {
+		ft_putstr_fd("too many arguments\n", 2);
+		return (1);
+	}
+	print_var_lst(env_lst);
 	return (0);
 }

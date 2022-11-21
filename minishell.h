@@ -48,8 +48,8 @@ void ft_execve(char *argv[], char *envp[]);
 int	ft_access(const char *pathname);
 int	run_cmds(t_cmd_info **cmd_infos, char *envp[]);
 
-int echo(int argc, char *argv[]);
-int cd(int argc, char *argv[]);
+int echo(int argc, char *argv[], t_var_lst *env_lst);
+int cd(int argc, char *argv[], t_var_lst *env_lst);
 //int init_var_lst(t_var_lst *var_lst, char *envp[]);
 t_var_lst *init_var_lst(char *envp[]);
 void print_var_lst(t_var_lst *var_lst);
@@ -57,4 +57,8 @@ char **ft_slice(char *str, char sep);
 int export(int argc, char *argv[], t_var_lst *export_lst, t_var_lst *env_lst);
 void sort_var_lst(t_var_lst *var_lst);
 void add_var_lst(t_var_lst *var_lst, char *var, char *val);
+char *ft_getenv(t_var_lst *env_lst, char *var);
+int env(int argc, char *argv[], t_var_lst *env_lst);
+int remove_var_lst(t_var_lst *var_lst, char *var);
+int unset(int argc, char *argv[], t_var_lst *export_lst, t_var_lst *env_lst);
 #endif

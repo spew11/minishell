@@ -1,5 +1,47 @@
 #include "minishell.h"
-//넣을 때 중복검사해야됨
+
+int remove_var_lst(t_var_lst *var_lst, char *var) {
+	char *val;
+	t_var_lst *now;
+
+	t_var_lst *prev = 0;
+	now = var_lst;
+	if (ft_strncmp(now->var, var, -1) == 0) {
+		var_lst = var_lst->next;
+		free(now);
+		now = var_lst;
+		return (0);
+	}
+	while (now->next) {
+		if (ft_strncmp(now->var, var, -1) == 0) {
+			prev->next = now->next;
+			free(now);
+			return (0);
+		}
+		prev = now;
+		now = now->next;
+	}
+	if (ft_strncmp(now->var, var, -1) == 0) {
+		prev->next = 0;
+		free(now);
+	}
+	return (0);
+}
+
+char *ft_getenv(t_var_lst *env, char *var) {
+	char *val;
+	t_var_lst *now;
+
+	now = env;
+	while (now) {
+		if (ft_strncmp(now->var, var, -1) == 0) {
+			return now->val;
+		}
+		now = now->next;
+	}
+	return 0;
+}
+
 void add_var_lst(t_var_lst *var_lst, char *var, char *val) {
 	
 	t_var_lst *now;
