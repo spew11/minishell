@@ -69,6 +69,7 @@ int pwd(void) {
 	return (0);
 }
 
-int export(int argc, char *argv[]) {
+/*int export(int argc, char *argv[], t_export_lst *export_lst) {
+	if (argc == 
 	return (0);
-}
+}*/

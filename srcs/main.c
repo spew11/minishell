@@ -9,8 +9,9 @@ int main(int argc, char *argv[], char *envp[]) {
     tcsetattr(0, TCSANOW, &term);
 	signal_on();
 	t_env_lst env_lst;
-
+	t_env_lst export_lst;
 	init_env_lst(&env_lst, envp);
+	init_env_lst(&export_lst, envp);
 	while (1) {
 		line = readline("minishell$ ");
 		if (!line) {
@@ -50,7 +51,8 @@ int main(int argc, char *argv[], char *envp[]) {
 }*/
 
 int main(int argc, char *argv[], char *envp[]) {
-	t_env_lst env_lst;
-	init_env_lst(&env_lst, envp);
+	t_var_lst env_lst;
+	init_var_lst(&env_lst, envp);
+	print_var_lst(&env_lst);
 	return (0);
 }
