@@ -1,18 +1,16 @@
 #include "minishell.h"
 
-int remove_var_lst(t_var_lst *var_lst, char *var) {
-	char *val;
+int remove_var_lst(t_var_lst **var_lst, char *var) {
 	t_var_lst *now;
 
 	t_var_lst *prev = 0;
-	now = var_lst;
+	now = *var_lst;
 	if (ft_strncmp(now->var, var, -1) == 0) {
-		var_lst = var_lst->next;
+		(*var_lst) = (*var_lst)->next;
 		free(now);
-		now = var_lst;
 		return (0);
 	}
-	while (now->next) {
+	while (now) {
 		if (ft_strncmp(now->var, var, -1) == 0) {
 			prev->next = now->next;
 			free(now);
@@ -20,10 +18,6 @@ int remove_var_lst(t_var_lst *var_lst, char *var) {
 		}
 		prev = now;
 		now = now->next;
-	}
-	if (ft_strncmp(now->var, var, -1) == 0) {
-		prev->next = 0;
-		free(now);
 	}
 	return (0);
 }
@@ -42,11 +36,11 @@ char *ft_getenv(t_var_lst *env, char *var) {
 	return 0;
 }
 
-void add_var_lst(t_var_lst *var_lst, char *var, char *val) {
+void add_var_lst(t_var_lst **var_lst, char *var, char *val) {
 	
 	t_var_lst *now;
 
-	now = var_lst;
+	now = *var_lst;
 	while (now->next) {
 		if (ft_strncmp(now->var, var, -1) == 0) {
 			if (val) {
@@ -102,12 +96,12 @@ void sort_var_lst(t_var_lst *var_lst) {
 void print_var_lst(t_var_lst *var_lst) {
 	t_var_lst *now = var_lst;
 	while (now) {
-		if (now->var && now->val) {
+		if (now->val) {
 			printf("%s", now->var);
 			printf("=");
 			printf("%s\n", now->val);
 		}
-		else if (now->var && !now->val) {
+		else{
 			printf("%s\n", now->var);
 		}
 		now = now->next;

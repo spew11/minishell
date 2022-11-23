@@ -91,11 +91,11 @@ static char **get_var_val(char *str){
 	return (strs);
 }
 
-int export(int argc, char *argv[], t_var_lst *export_lst, t_var_lst *env_lst) {
+int export(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst) {
 	char **var_val;
 
 	if (argc == 1) {
-		print_var_lst(export_lst);
+		print_var_lst(*export_lst);
 	}
 	else {
 		int i = 1;
@@ -124,12 +124,12 @@ int export(int argc, char *argv[], t_var_lst *export_lst, t_var_lst *env_lst) {
 			}
 			i++;
 		}
-		sort_var_lst(export_lst);
+		sort_var_lst(*export_lst);
 	}
 	return (0);
 }
 
-int unset(int argc, char *argv[], t_var_lst *export_lst, t_var_lst *env_lst) {
+int unset(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst) {
 	int i = 1;
 	while (i < argc) {
 		int j = 0;

@@ -12,7 +12,6 @@
 # include <sys/wait.h>
 # include <unistd.h>
 # include <fcntl.h>
-//# include <sys/fcntl.h>
 # include "libft/libft.h"
 # define FILE 1 //> , <
 # define PIPE 2 // |
@@ -54,11 +53,11 @@ int cd(int argc, char *argv[], t_var_lst *env_lst);
 t_var_lst *init_var_lst(char *envp[]);
 void print_var_lst(t_var_lst *var_lst);
 char **ft_slice(char *str, char sep);
-int export(int argc, char *argv[], t_var_lst *export_lst, t_var_lst *env_lst);
+int export(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst);
 void sort_var_lst(t_var_lst *var_lst);
-void add_var_lst(t_var_lst *var_lst, char *var, char *val);
+void add_var_lst(t_var_lst **var_lst, char *var, char *val);
 char *ft_getenv(t_var_lst *env_lst, char *var);
 int env(int argc, char *argv[], t_var_lst *env_lst);
-int remove_var_lst(t_var_lst *var_lst, char *var);
-int unset(int argc, char *argv[], t_var_lst *export_lst, t_var_lst *env_lst);
+int remove_var_lst(t_var_lst **var_lst, char *var);
+int unset(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst);
 #endif
