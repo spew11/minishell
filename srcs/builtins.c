@@ -28,6 +28,7 @@ int echo(int argc, char *argv[], t_var_lst *env_lst)
 	if (!opt_f) {
 		printf("\n");
 	}
+	exit_status = 0;
 	return (0);
 }
 
@@ -36,6 +37,7 @@ int cd(int argc, char *argv[], t_var_lst *env_lst) {
 
 	if (argc > 2) {
 		ft_putstr_fd("too many arguments\n", 2);
+		exit_status = 1;
 		return (1);
 	}
 	if (argc == 1) {
@@ -51,6 +53,7 @@ int cd(int argc, char *argv[], t_var_lst *env_lst) {
 			else {
 				if (ft_access(paths[i]) < 0) {
 					ft_putstr_fd("No such file or directory\n", 2);
+					exit_status = 1;
 					return (1);
 				}
 				chdir(paths[i]);
@@ -58,6 +61,7 @@ int cd(int argc, char *argv[], t_var_lst *env_lst) {
 			i++;
 		}
 	}
+	exit_status = 0;
 	return (0);
 }
 

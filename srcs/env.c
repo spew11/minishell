@@ -1,5 +1,36 @@
 #include "minishell.h"
 
+char **env_lst2env_arr(t_var_lst *env_lst) {
+	char **envp = 0;
+	if (!env_lst) {
+		return envp;
+	}
+	int cnt = 0;
+	t_var_lst *now = env_lst;
+	while (now) {
+		now = now->next;
+		cnt++;
+	}
+	envp = (char **)malloc(sizeof(char *) * (cnt + 1));
+	now = env_lst;
+
+	int i = 0;
+	while (now) {
+		if (now->val) {
+			char *tmp = ft_strjoin(now->var, "=");
+			envp[i] = ft_strjoin(tmp, now->val);
+			free(tmp);
+		}
+		else {
+			envp[i] = now->var;
+		}
+		i++;
+		now = now->next;
+	}
+	envp[i] = 0;
+	return envp;
+}
+
 int find_var_in_lst(t_var_lst *var_lst, char *var) {
 	t_var_lst *now;
 
@@ -117,9 +148,6 @@ void sort_var_lst(t_var_lst *var_lst) {
 }
 
 void print_var_lst(t_var_lst *var_lst) {
-	if (!var_lst || !find_var_in_lst(var_lst, "PATH")) {
-		ft_putstr_fd("No such file or directory\n", 2);
-	}
 	t_var_lst *now = var_lst;
 	while (now) {
 		if (now->val) {

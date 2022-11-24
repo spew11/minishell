@@ -70,9 +70,10 @@ static char *get_pathname(char *envp[], char *filename) {
 	return (0);
 }
 
-void ft_execve(char *argv[], char *envp[]) {
+void ft_execve(char *argv[], t_var_lst *env_lst) {
+	char **envp = env_lst2env_arr(env_lst);
 	char *pathname = get_pathname(envp, argv[0]);
-	execve(pathname, argv, 0);
+	execve(pathname, argv, envp);
 	return ;
 }
 

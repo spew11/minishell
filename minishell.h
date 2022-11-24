@@ -43,7 +43,7 @@ void	signal_on(void);
 void		chk_fork_err(int pid);
 void		chk_fd_err(int fd);
 
-void ft_execve(char *argv[], char *envp[]);
+void ft_execve(char *argv[], t_var_lst *env_lst);
 int	ft_access(const char *pathname);
 int	run_cmds(t_cmd_info **cmd_infos, char *envp[]);
 
@@ -62,4 +62,5 @@ int remove_var_lst(t_var_lst **var_lst, char *var);
 int unset(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst);
 int chk_var_name(char *var_name);
 void var_name_err(void);
+char **env_lst2env_arr(t_var_lst *env_lst);
 #endif
