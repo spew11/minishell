@@ -1,82 +1,74 @@
 #include "minishell.h"
 
-static int run_func(int argc, char *argv[], char *envp[]) {
-	if (argc == 0) {
-		argv = ft_split("cat", ' ');
-		//ex. echo happy > out1 > out2
-	}
-	ft_execve(argv, envp);
-	return (0);
-}
-
-static int run_cmd(t_cmd_info **cmd_infos, int idx, char *envp[]) {
+static int run_cmd(t_cmd_info *cmd_info_arr, int pipe_num, int idx, t_var_lst *env_lst) {
 	int in_fd = 0;
-	int out_fd = 0;
-
-	if (cmd_infos[idx]->in_str) {
-		if (ft_access(cmd_infos[idx]->in_str) == -1) {
-			ft_putstr_fd("No such file or derectory\n", 2);
-			exit(1);
+	int out_fd = 1;
+	int type = 0;
+	char *filename;
+	//set input output
+	int i = 0;
+	while (i < cmd_info_arr[idx].redir_num) {
+		type = cmd_info_arr[idx].redir[i].type;
+		filename = cmd_info_arr[idx].redir[i].str;
+		if (type == 1) {
+			if (ft_access(filename) == -1) {
+				ft_putstr_fd("No such file or directory\n", 2);
+				exit(1);
+			}
+			in_fd = open(filename, O_RDONLY, 0644);
+			chk_fd_err(in_fd);
+			dup2(in_fd, 0);
 		}
-		in_fd = open(cmd_infos[idx]->in_str, O_RDONLY, 0644);
-		chk_fd_err(in_fd);
-		dup2(in_fd, 0);
+		else {
+			if (type == 3) {
+				out_fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+			}
+			else if (type == 4) {
+				out_fd = open(filename, O_WRONLY | O_TRUNC | O_APPEND | O_CREAT, 0644);
+			}
+			chk_fd_err(out_fd);
+			dup2(out_fd, 1);
+		}
+		i++;
 	}
-	if (cmd_infos[idx]->out_str) {
-		if (cmd_infos[idx]->out_type == FILE) {
-			out_fd = open(cmd_infos[idx]->out_str, O_WRONLY | O_TRUNC | O_CREAT, 0644);
-		}
-		else if (cmd_infos[idx]->out_type == FILE_END) {
-			out_fd = open(cmd_infos[idx]->out_str, O_WRONLY | O_APPEND | O_CREAT, 0644);
-		}
-		chk_fd_err(out_fd);
-		dup2(out_fd, 1);
-	}
-	if (cmd_infos[idx]->out_type == PIPE) {
+	//run_func
+	if (idx < pipe_num) {
 		int fd[2];
 		if (pipe(fd) < 0) {
 			exit(1);
 		}
-		int pid = fork();
+		pid_t pid = fork();
 		chk_fork_err(pid);
 		if (pid == 0) {
 			close(fd[1]);
 			dup2(fd[0], 0);
-			run_cmd(cmd_infos, idx + 1, envp);
+			run_cmd(cmd_info_arr, pipe_num, idx + 1, env_lst);
 		}
 		else {
 			close(fd[0]);
-			dup2(fd[1], 1);
-			run_func(cmd_infos[idx]->argc, cmd_infos[idx]->argv, envp);
-		}
-	}
-	if (cmd_infos[idx + 1]) {
-		int pid = fork();
-		chk_fork_err(pid);
-		if (pid == 0) {
-			run_func(cmd_infos[idx]->argc, cmd_infos[idx]->argv, envp);
-		}
-		else {
-			if (cmd_infos[idx + 1]) {
-				run_cmd(cmd_infos, idx + 1, envp);
-			}
+			dup2(fd[1], out_fd);
+			ft_execve(cmd_info_arr[idx].argv, env_lst);
+			//unlink tmpfiles
 		}
 	}
 	else {
-		run_func(cmd_infos[idx]->argc, cmd_infos[idx]->argv, envp);
+		ft_execve(cmd_info_arr[idx].argv, env_lst);
+		//unlink tmpfiles
 	}
-	return 0;
+	return (0);
 }
 
-int run_cmds(t_cmd_info **cmd_infos, char *envp[]) {
-	int pid = fork();
+int run_cmds(t_cmd_info *cmd_info_arr, int pipe_num, t_var_lst *env_lst) {
+	pid_t pid = fork();
+	int wstatus;
+
 	chk_fork_err(pid);
 	if (pid == 0) {
-		run_cmd(cmd_infos, 0, envp);
+		run_cmd(cmd_info_arr, pipe_num, 0, env_lst);
 	}
 	else {
-		if (wait(0) != pid) {
-			exit(1);
+		if (waitpid(pid, &wstatus, 0) != pid) {
+			exit(wstatus);
 		}
 	}
 	return (0);

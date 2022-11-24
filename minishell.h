@@ -13,11 +13,33 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include "libft/libft.h"
-# define FILE 1 //> , <
-# define PIPE 2 // |
-# define HERE_DOC 3 // <<
-# define FILE_END 4 // >>
-# define STDOUT 5
+# define INFILE 1 // '<'
+# define HERE_DOC 2 // '<<'
+# define OUTFILE 3 // '>'
+# define FILE_APPEND 4 // '>>'
+
+typedef struct s_redir {
+	int		type;
+	char	*str;
+} t_redir;
+
+typedef struct s_cmd_info {
+	int		argc;
+	char	**argv;
+	int		redir_num;
+	t_redir *redir;
+	char **tmpfiles;
+} t_cmd_info;
+
+enum	e_opt {
+	ARGC,
+	REDIR,
+};
+
+t_cmd_info	*parse_line(char *line, int *pipe_num, char *envp[]);
+//temp
+void print(void *ptr);
+void	print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num);
 
 int exit_status;
 
@@ -27,16 +49,6 @@ typedef struct s_var_lst {
 	struct s_var_lst *next;
 }				t_var_lst;
 
-typedef struct s_cmd_info {
-	char	**argv;
-	int		argc;
-	int		in_type;
-	char	*in_str;
-	int		out_type;
-	char	*out_str;
-}				t_cmd_info;
-
-
 void	sig_handler(int signal);
 void	signal_on(void);
 
@@ -45,11 +57,10 @@ void		chk_fd_err(int fd);
 
 void ft_execve(char *argv[], t_var_lst *env_lst);
 int	ft_access(const char *pathname);
-int	run_cmds(t_cmd_info **cmd_infos, char *envp[]);
+int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_var_lst *env_lst);
 
 int echo(int argc, char *argv[], t_var_lst *env_lst);
 int cd(int argc, char *argv[], t_var_lst *env_lst);
-//int init_var_lst(t_var_lst *var_lst, char *envp[]);
 t_var_lst *init_var_lst(char *envp[]);
 void print_var_lst(t_var_lst *var_lst);
 char **ft_slice(char *str, char sep);
