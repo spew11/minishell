@@ -6,13 +6,13 @@
 #    By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/05 21:09:19 by eunjilee          #+#    #+#              #
-#    Updated: 2022/11/20 01:32:13 by eunjilee         ###   ########.fr        #
+#    Updated: 2022/11/23 17:52:27 by eunjilee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 
-CC = gcc
+CC = gcc -I .
 
 #CCFLAGS = -Wall -Wextra -Werror
 
@@ -21,17 +21,18 @@ CCFLAGS1 = -L /Users/eunjilee/.brew/opt/readline/lib -lreadline
 CCFLAGS2 = -I /Users/eunjilee/.brew/opt/readline/include
 
 LIBFT_NAME = libft.a
-LINFT_DIR = libft/
+LIBFT_DIR = libft/
 
 MINISHELL = main.c \
 			builtins.c \
 			utils.c \
 			errors.c \
+			env.c \
 
 SRCS = $(addprefix srcs/, $(MINISHELL))
 OBJS = $(SRCS:%.c=%.o)
 
-LIBFT = $(addprefix $(LIBFT_SIR), $(LIBFT_NAME))
+LIBFT = $(addprefix $(LIBFT_DIR), $(LIBFT_NAME))
 
 all: $(NAME)
 
@@ -46,7 +47,7 @@ $(NAME): $(OBJS) $(LIBFT)
 
 clean:
 		rm -f $(OBJS)
-		make -C $(LINFT_DIR) clean
+		make -C $(LIBFT_DIR) clean
 
 fclean: clean
 		rm -f $(NAME)

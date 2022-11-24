@@ -57,9 +57,10 @@ int main(int argc, char *argv[], char *envp[]) {
 //	export(2, ft_split("export hansu=eunji", ' '), export_lst, env_lst);
 //	export(4, ft_split("export apple grape=mine $hell", ' '), export_lst, env_lst);
 //	export(4, ft_split("export apple=banana grape=mine $hell", ' '), export_lst, env_lst);
-	export(4, ft_split("export apple grape=mine", ' '), export_lst, env_lst);
-	print_var_lst(export_lst);
-	unset(3, ft_split("unset SHLVL grape", ' '), export_lst, env_lst);
+//	export(4, ft_split("export apple grape=mine", ' '), &export_lst, &env_lst);
+//	print_var_lst(export_lst);
+	unset(27, ft_split("unset XDG_DATA_DIRS HOSTTYPE WT_PROFILE_ID OLDPWD _ PATH SHELL WSL_DISTRO_NAME JAVA_HOME NAME PWD LOGNAME MOTD HOME LANG WSL_INTEROP LS_COLORS LESSCLOSE TERM LESSOPEN USER SELVL WSLENV WT_SESSION MOTD_SHOWN SHLVL XDG_DATA_DIRS HOSTTYPE WT_PROFILE_ID OLDPWD", ' '), &export_lst, &env_lst);
+//	unset(2, ft_split("unset HOME", ' '), &export_lst, &env_lst);
 	print_var_lst(export_lst);
 //	print_var_lst(env_lst);
 	return (0);

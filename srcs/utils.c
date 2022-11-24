@@ -1,5 +1,21 @@
 #include "minishell.h"
 
+int chk_var_name(char *var_name) {
+	int i = 0;
+	while (var_name[i]) {
+		if (i == 0 && ft_isdigit(var_name[i])) {
+			var_name_err();
+			return (0);
+		}
+		if (!ft_isalnum(var_name[i]) && !var_name[i] == '_') {
+			var_name_err();
+			return (0);
+		}
+		i++;
+	}
+	return (1);
+}
+
 char **ft_slice(char *str, char sep) {
 	char **strs;
 	int i = 0;

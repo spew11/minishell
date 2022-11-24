@@ -80,14 +80,6 @@ static char **get_var_val(char *str){
 	if (val[1] == 0) { //happy=가 들어온 경우
 		strs[1] = "\"\"";
 	}
-	int i = 0;
-	while (var[i]) {
-		if (!ft_isalnum(var[i])) {
-			ft_putstr_fd("not a valid identifier\n", 2);
-			return (0);
-		}
-		i++;
-	}
 	return (strs);
 }
 
@@ -102,23 +94,13 @@ int export(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst) 
 		while (argv[i]) {
 			if (ft_strchr(argv[i], '=')) {
 				var_val = get_var_val(argv[i]);
-				if (var_val) {
+				if (var_val && chk_var_name(var_val[0])) {
 					add_var_lst(export_lst, var_val[0], var_val[1]);
 					add_var_lst(env_lst, var_val[0], var_val[1]);
 				}
 			}
 			else {
-				int j = 0;
-				int err_f = 0;
-				while (argv[i][j]) {
-					if (!ft_isalnum(argv[i][j])) {
-						ft_putstr_fd("not a valid identifier\n", 2);
-						err_f = 1;
-						break;
-					}
-					j++;
-				}
-				if (err_f == 0) {
+				if (chk_var_name(argv[i])) {
 					add_var_lst(export_lst, argv[i], 0);
 				}
 			}
@@ -132,17 +114,7 @@ int export(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst) 
 int unset(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst) {
 	int i = 1;
 	while (i < argc) {
-		int j = 0;
-		int err_f = 0;
-		while (argv[i][j]) {
-			if (!ft_isalnum(argv[i][j])) {
-				ft_putstr_fd("not a valid identifier\n", 2);
-				err_f = 1;
-				break;
-			}
-			j++;
-		}
-		if (err_f == 0) {
+		if (chk_var_name(argv[i])) {
 			remove_var_lst(export_lst, argv[i]);
 			remove_var_lst(env_lst, argv[i]);
 		}
