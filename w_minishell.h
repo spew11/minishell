@@ -5,7 +5,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <wait.h>
-#include "libft.h"
+#include "./libft.h"
 
 #define INFILE		1 // '<'
 #define	HERE_DOC	2 // '<<'
@@ -24,15 +24,24 @@ typedef struct s_cmd_info {
 	t_redir *redir;
 } t_cmd_info;
 
+typedef struct s_var_lst {
+	char *var;
+	char *val;
+	struct s_var_lst *next;
+}				t_var_lst;
+
 enum	e_opt {
 	ARGC,
 	REDIR,
 };
 
-t_cmd_info	*parse_line(char *line, int *pipe_num, char *envp[]);
-//temp
+t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst);
+
+// temp
 void print(void *ptr);
 void	print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num);
+t_var_lst *init_var_lst(char *envp[]);
+char *find_env(t_var_lst *env_lst, char *str);
 /*
 
 echo happy > out1 > out2

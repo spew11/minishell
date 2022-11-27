@@ -55,9 +55,20 @@ int main(int argc, char *argv[], char *envp[])
 	char		*line;
 	int			pipe_num;
 	t_cmd_info	*cmd_arr;
+	t_var_lst *env_lst;
 
+	env_lst = init_var_lst(envp);
 	line = readline("minishell$ ");
 
-	cmd_arr = parse_line(line, &pipe_num, envp);
+	cmd_arr = parse_line(line, &pipe_num, env_lst);
 	// recur(cmd_arr, envp, pipe_num, 0, -1);
 }
+
+/* 에러 메모
+
+val="   "처럼 변수가 없거나 스페이스만 있을때 오류를 띄워줘야한다.
+
+
+
+
+*/

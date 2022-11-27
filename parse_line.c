@@ -21,6 +21,50 @@ int	is_flag(char *str)
 	return (0);
 }
 
+
+void	unclosed_quote_err(t_list *el_list)
+{
+	printf("unclosed quote err");
+}
+int is_space(char ch)
+{
+	if ((9 <= ch && 13 >= ch) || ch == 32)
+		return (1);
+	return (0);
+}
+// cat  <"ou "t 
+t_list	*split_line(char *line, t_var_lst *env_lst)
+{
+	t_list	*spl_list;
+	int		el_start_i;
+	int		line_i;
+	int		quote_flag;
+
+	spl_list = NULL;
+	el_start_i = 0;
+	line_i = 0;
+	quote_flag = 0; // NOT
+	while (line[line_i])
+	{
+		if (!quote_flag && is_space(line[line_i])) {
+			if (el_start_i != line_i)
+				ft_lstadd_back(&spl_list, ft_lstnew(ft_substr(line, el_start_i, line_i - el_start_i)));
+			el_start_i = line_i + 1;
+		}
+		else if (!quote_flag && (line[line_i] == '\"' || line[line_i] == '\''))
+			quote_flag = line[line_i];
+		else if (quote_flag == line[line_i])
+			quote_flag = 0;
+		line_i++;
+	}
+	// null로 끝난거 처리
+	if (quote_flag)
+		unclosed_quote_err(spl_list);
+	if (el_start_i != line_i)
+		ft_lstadd_back(&spl_list, ft_lstnew(ft_substr(line, el_start_i, line_i - el_start_i)));
+	ft_lstiter(spl_list, print);printf("\n");
+	return (spl_list);
+}
 int	is_new_element(char *str, int jdx, char *buff)
 {
 	// flag를 버퍼에 넣는 상황
@@ -36,44 +80,50 @@ int	is_new_element(char *str, int jdx, char *buff)
 			return (0);
 		return (1);
 	}
-	// flag가 아닌 일반 문자일때 buff가 flag이면 새로 담아야한다.
+	// buff가 flag이면서 일반문자를 받았을때
 	if (is_flag(buff))
 		return (1);
+	// buff가 flag가 아니면서 일반문자를 받았을때
 	return (0);
 }
-
-t_list *get_element_list(char *line, char *envp[])
+t_list *get_element_list(char *line, t_var_lst *env_lst)
 {
 	t_list	*el_list = NULL;
-	char	**spl;
+	t_list	*spl_list = NULL;
+	t_list	*cur;
 	char	*buff;
-	int 	spl_i = 0;
-	int		spl_j = 0;
+	int		con_i = 0;
 	int		buf_i = 0;
+	int		quote_flag = 0;
 
-	spl = ft_split(line, ' '); // malloc
-	while (spl[spl_i]) {
-		buff = malloc(sizeof(char) * (ft_strlen(spl[spl_i]) + 1)); // malloc
-		ft_bzero(buff, sizeof(char) * (ft_strlen(spl[spl_i]) + 1));
-		spl_j = 0;
+	spl_list = split_line(line, env_lst); // malloc
+	cur = spl_list;
+	while (cur) {
+		buff = malloc(sizeof(char) * (ft_strlen(cur->content) + 1)); // malloc
+		ft_bzero(buff, sizeof(char) * (ft_strlen(cur->content) + 1));
+		con_i = 0;
 		buf_i = 0;
-		while (spl[spl_i][spl_j]) {
-			if (ft_strncmp(buff, "", 1) && is_new_element(spl[spl_i], spl_j, buff)) {
+		while (((char *)(cur->content))[con_i]) {
+			if (ft_strncmp(buff, "", 1) && !quote_flag && is_new_element((char *)cur->content, con_i, buff)) {
 				buff[buf_i] = '\0';
 				ft_lstadd_back(&el_list, ft_lstnew(ft_strdup(buff)));
 				// ft_lstiter(el_list, print);printf("\n");
 				ft_bzero(buff, ft_strlen(buff));
 				buf_i = 0;
 			}
-			buff[buf_i] = spl[spl_i][spl_j];
+			if (!quote_flag && (((char *)(cur->content))[con_i] == '\'' || ((char *)(cur->content))[con_i] == '\"'))
+				quote_flag = ((char *)(cur->content))[con_i];
+			else if (quote_flag == ((char *)(cur->content))[con_i])
+				quote_flag = 0;
+			buff[buf_i] = ((char *)(cur->content))[con_i];
 			buf_i++;
-			spl_j++;
+			con_i++;
 		}
 		buff[buf_i] = '\0';
 		ft_lstadd_back(&el_list, ft_lstnew(ft_strdup(buff)));
 		// ft_lstiter(el_list, print);printf("\n");
 		free(buff);
-		spl_i++;
+		cur = cur->next;
 	}
 	return (el_list);
 }
@@ -81,7 +131,7 @@ t_list *get_element_list(char *line, char *envp[])
 void	flag_err(char *str)
 {
 	//free함수 만들기
-	printf("custom syntax error : %s\n", str);
+	printf("token syntax error : %s\n", str);
 }
 
 int count_pipe(t_list *el_list)
@@ -177,8 +227,98 @@ int	get_type(char *str)
 		return (FILE_APPEND);
 	return (0);
 }
+// $뒤에 특수기호가 오는 상황은 나중에 해야함
+char	*expand_env(char *substr, int *str_i, t_var_lst *env_lst)
+{
+	t_var_lst	*cur;
+	int			len;
 
-void	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *el_list)
+	if (substr[0] == '?') {
+		*str_i += 1;
+		return (ft_strdup("exit status"));
+	}
+	len = 0;
+	while (ft_isalpha(substr[len]) || ft_isalnum(substr[len]))
+		len++;
+	*str_i += len;
+	cur = env_lst;
+	while (cur)
+	{
+		if (!strncmp(substr , cur->var, len) && cur->var[len] == '\0')
+			return (ft_strdup(cur->val));
+		cur = cur->next;
+	}
+	return (ft_strdup(""));
+}
+char	*connect_list(t_list *list)
+{
+	char	*text;
+	t_list	*cur;
+	int		len;
+
+	len = 0;
+	cur = list;
+	while (cur)
+	{
+		len += ft_strlen((char *)(cur->content));
+		cur = cur->next;
+	}
+	text = malloc(sizeof(char) * (len + 1));
+	ft_bzero(text, sizeof(char) * (len+1));
+	cur = list;
+	while (cur)
+	{
+		ft_strlcat(text, (char *)(cur->content), len + 1);
+		cur = cur->next;
+	}
+	return (text);
+}
+char	*replace_symbol_to_text(char *str, t_var_lst *env_lst)
+{
+	t_list	*text_list = NULL;
+	char	*text;
+	char	*buff;
+	int		str_i = 0;
+	int		buf_i = 0;
+	int		quote_flag = 0;
+
+	buff = malloc(sizeof(char) * (ft_strlen(str) + 1));
+	ft_bzero(buff, (ft_strlen(str) + 1));
+	while (str[str_i])
+	{
+		if (!quote_flag && (str[str_i] == '\'' || str[str_i] == '\"')) {
+			buff[buf_i] = '\0';
+			ft_lstadd_back(&text_list, ft_lstnew(ft_strdup(buff)));
+			ft_bzero(buff, (ft_strlen(str) + 1));
+			buf_i = 0;
+			quote_flag = str[str_i];
+		}
+		else if (quote_flag == str[str_i]) {
+			buff[buf_i] = '\0';
+			ft_lstadd_back(&text_list, ft_lstnew(ft_strdup(buff)));
+			ft_bzero(buff, (ft_strlen(str) + 1));
+			buf_i = 0;
+			quote_flag = 0;
+		}
+		else if (str[str_i] == '$' && (quote_flag != '\'')) {
+			buff[buf_i] = '\0';
+			ft_lstadd_back(&text_list, ft_lstnew(ft_strdup(buff)));
+			ft_bzero(buff, (ft_strlen(str) + 1));
+			buf_i = 0;
+			ft_lstadd_back(&text_list, ft_lstnew(expand_env(str + str_i + 1, &str_i, env_lst)));
+		}
+		else
+			buff[buf_i++] = str[str_i];
+		str_i++;
+	}
+	buff[buf_i] = '\0';
+	ft_lstadd_back(&text_list, ft_lstnew(ft_strdup(buff)));
+	text = connect_list(text_list);
+	// clear함수 만들기
+	return (text);
+}
+
+void	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *el_list, t_var_lst *env_lst)
 {
 	t_list	*cur;
 	int		cmd_i;
@@ -199,39 +339,40 @@ void	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *el_list)
 		else if (is_flag(cur -> content)) {
 			cmd_info_arr[cmd_i].redir[re_i].type = get_type(cur->content);
 			cur = cur -> next;
-			cmd_info_arr[cmd_i].redir[re_i].str = ft_strdup(cur->content);
+			cmd_info_arr[cmd_i].redir[re_i].str = replace_symbol_to_text(cur->content, env_lst);
 			re_i += 1;
 		}
 		else {
-			cmd_info_arr[cmd_i].argv[av_i] = strdup(cur->content);
+			cmd_info_arr[cmd_i].argv[av_i] = replace_symbol_to_text(cur->content, env_lst);
 			av_i += 1;
 		}
 		cur = cur -> next;
 	}
 }
 
-t_cmd_info *get_cmd_info(t_list *el_list, int pipe_num)
+t_cmd_info *get_cmd_info(t_list *el_list, int pipe_num, t_var_lst *env_lst)
 {
 	t_cmd_info	*cmd_info_arr;
 
 	cmd_info_arr = init_cmd_info_arr(el_list, pipe_num);
-	fill_cmd_info_arr(cmd_info_arr, el_list);
+	fill_cmd_info_arr(cmd_info_arr, el_list, env_lst);
 	return (cmd_info_arr);
 }
 
-t_cmd_info	*parse_line(char *line, int *pipe_num, char *envp[])
+t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst)
 {
 	t_list		*el_list;
 	t_cmd_info	*cmd_info_arr;
 
 	// 역할에 구분없이 그냥 쪼개서 리스트에 담는다.
 	// line -> el_list
-	el_list = get_element_list(line, envp); ft_lstiter(el_list, print);printf("\n"); //malloc
+	el_list = get_element_list(line, env_lst); // malloc
+	ft_lstiter(el_list, print);printf("\n");
 	
 	// el_list -> cmd_info_arr
 	*pipe_num = count_pipe(el_list);
 	printf("[pipe_num: %d]\n", *pipe_num);//
-	cmd_info_arr = get_cmd_info(el_list, *pipe_num); // malloc
+	cmd_info_arr = get_cmd_info(el_list, *pipe_num, env_lst); // malloc
 	print_cmd_arr(cmd_info_arr, *pipe_num);//
 	return (cmd_info_arr);
 }

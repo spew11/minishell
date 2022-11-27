@@ -23,3 +23,16 @@ void	print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num)
 		printf("-------------------------------\n");
 	}
 }
+
+char *find_env(t_var_lst *env_lst, char *str)
+{
+	t_var_lst *cur;
+
+	cur = env_lst;
+	while (cur)
+	{
+		// printf("[%s]: [%s]\n", cur->var, cur->val);
+		cur = cur->next;
+	}
+	return (NULL);
+}
