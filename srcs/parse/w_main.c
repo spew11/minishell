@@ -1,4 +1,4 @@
-#include "w_minishell.h"
+#include "parse.h"
 
 // void cmd_redir(t_redir *redir);
 
@@ -55,13 +55,13 @@ int main(int argc, char *argv[], char *envp[])
 	char		*line;
 	int			pipe_num;
 	t_cmd_info	*cmd_arr;
-	t_var_lst *env_lst;
+	t_var_lst	*env_lst;
 
 	env_lst = init_var_lst(envp);
 	line = readline("minishell$ ");
 
 	cmd_arr = parse_line(line, &pipe_num, env_lst);
-	// recur(cmd_arr, envp, pipe_num, 0, -1);
+	// here_doc(cmd_arr, pipe_num);
 }
 
 /* 에러 메모

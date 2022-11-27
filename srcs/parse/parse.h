@@ -35,13 +35,18 @@ enum	e_opt {
 	REDIR,
 };
 
+t_list *divide_line_into_token(char *line);
+t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num);
+void	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *token_list, t_var_lst *env_lst);
+// temp 
 t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst);
-
-// temp
 void print(void *ptr);
 void	print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num);
 t_var_lst *init_var_lst(char *envp[]);
 char *find_env(t_var_lst *env_lst, char *str);
+int	is_special_symbol(char *str);
+
+
 /*
 
 echo happy > out1 > out2

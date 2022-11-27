@@ -1,4 +1,4 @@
-#include "./w_minishell.h"
+#include "./parse.h"
 
 char **ft_slice(char *str, char sep)
 {
