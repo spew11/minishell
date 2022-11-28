@@ -5,6 +5,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <wait.h>
+#include <fcntl.h>
 #include "./libft.h"
 
 #define INFILE		1 // '<'
@@ -22,6 +23,8 @@ typedef struct s_cmd_info {
 	char	**argv;
 	int		redir_num;
 	t_redir *redir;
+	int		here_num;
+	char	**here;
 } t_cmd_info;
 
 typedef struct s_var_lst {
@@ -33,19 +36,21 @@ typedef struct s_var_lst {
 enum	e_opt {
 	ARGC,
 	REDIR,
+	HERE,
 };
 
 t_list *divide_line_into_token(char *line);
 t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num);
 void	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *token_list, t_var_lst *env_lst);
+void	here_doc(t_cmd_info *cmd_arr, int pipe_num);
 // temp 
 t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst);
 void print(void *ptr);
 void	print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num);
 t_var_lst *init_var_lst(char *envp[]);
 char *find_env(t_var_lst *env_lst, char *str);
-int	is_special_symbol(char *str);
-
+int	is_redir(char *str);
+void	append_buff_to_list(char *buff, int *buf_i, t_list **list);
 
 /*
 

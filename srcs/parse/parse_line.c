@@ -26,12 +26,12 @@ t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst)
 	ft_lstiter(token_list, print);printf("\n");
 	
 	*pipe_num = count_pipe(token_list);
-	// printf("[pipe_num: %d]\n", *pipe_num);
+	printf("[pipe_num: %d]\n", *pipe_num);
 
 	// token 분류하기
 	cmd_info_arr = init_cmd_info_arr(token_list, *pipe_num); // malloc
 	fill_cmd_info_arr(cmd_info_arr, token_list, env_lst); // malloc
-	print_cmd_arr(cmd_info_arr, *pipe_num);
+	// print_cmd_arr(cmd_info_arr, *pipe_num);
 	return (cmd_info_arr);
 }
 

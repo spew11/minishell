@@ -49,7 +49,7 @@ char	*connect_list(t_list *list)
 		cur = cur->next;
 	}
 	text = malloc(sizeof(char) * (len + 1));
-	ft_bzero(text, sizeof(char) * (len+1));
+	ft_bzero(text, sizeof(char) * (len + 1));
 	cur = list;
 	while (cur)
 	{
@@ -58,6 +58,7 @@ char	*connect_list(t_list *list)
 	}
 	return (text);
 }
+
 char	*replace_symbol_to_text(char *str, t_var_lst *env_lst)
 {
 	t_list	*text_list = NULL;
@@ -71,33 +72,26 @@ char	*replace_symbol_to_text(char *str, t_var_lst *env_lst)
 	ft_bzero(buff, (ft_strlen(str) + 1));
 	while (str[str_i])
 	{
-		if (!quote_flag && (str[str_i] == '\'' || str[str_i] == '\"')) {
-			buff[buf_i] = '\0';
-			ft_lstadd_back(&text_list, ft_lstnew(ft_strdup(buff)));
-			ft_bzero(buff, (ft_strlen(str) + 1));
-			buf_i = 0;
+		if (!quote_flag && (str[str_i] == '\'' || str[str_i] == '\"'))
+		{
+			append_buff_to_list(buff, &buf_i, &text_list);
 			quote_flag = str[str_i];
 		}
-		else if (quote_flag == str[str_i]) {
-			buff[buf_i] = '\0';
-			ft_lstadd_back(&text_list, ft_lstnew(ft_strdup(buff)));
-			ft_bzero(buff, (ft_strlen(str) + 1));
-			buf_i = 0;
+		else if (quote_flag == str[str_i])
+		{
+			append_buff_to_list(buff, &buf_i, &text_list);
 			quote_flag = 0;
 		}
-		else if (str[str_i] == '$' && (quote_flag != '\'')) {
-			buff[buf_i] = '\0';
-			ft_lstadd_back(&text_list, ft_lstnew(ft_strdup(buff)));
-			ft_bzero(buff, (ft_strlen(str) + 1));
-			buf_i = 0;
+		else if (str[str_i] == '$' && (quote_flag != '\''))
+		{
+			append_buff_to_list(buff, &buf_i, &text_list);
 			ft_lstadd_back(&text_list, ft_lstnew(expand_env(str + str_i + 1, &str_i, env_lst)));
 		}
 		else
 			buff[buf_i++] = str[str_i];
 		str_i++;
 	}
-	buff[buf_i] = '\0';
-	ft_lstadd_back(&text_list, ft_lstnew(ft_strdup(buff)));
+	append_buff_to_list(buff, &buf_i, &text_list);
 	text = connect_list(text_list);
 	// clear함수 만들기
 	return (text);
@@ -121,7 +115,7 @@ void	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *token_list, t_var_lst *
 			re_i = 0;
 			cmd_i++;
 		}
-		else if (is_special_symbol(cur -> content)) {
+		else if (is_redir(cur -> content)) {
 			cmd_info_arr[cmd_i].redir[re_i].type = get_type(cur->content);
 			cur = cur -> next;
 			cmd_info_arr[cmd_i].redir[re_i].str = replace_symbol_to_text(cur->content, env_lst);

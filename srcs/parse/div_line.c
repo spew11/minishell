@@ -2,7 +2,7 @@
 
 int	is_new_token(char *str, int jdx, char *buff)
 {
-	// flag를 버퍼에 넣는 상황
+	// flag를 버퍼에 새로 넣는 상황
 	if (str[jdx] == '|')
 		return (1);
 	else if (str[jdx] == '<') {
@@ -16,7 +16,7 @@ int	is_new_token(char *str, int jdx, char *buff)
 		return (1);
 	}
 	// buff가 flag이면서 일반문자를 받았을때
-	if (is_special_symbol(buff))
+	if (is_redir(buff) || !ft_strncmp(buff, "|", 2))
 		return (1);
 	// buff가 flag가 아니면서 일반문자를 받았을때
 	return (0);
@@ -34,7 +34,7 @@ int is_space(char ch)
 	return (0);
 }
 
-t_list	*split_line_by_space(char *line)
+t_list	*split_by_space(char *line)
 {
 	t_list	*spl_list;
 	int		start_i;
@@ -64,7 +64,7 @@ t_list	*split_line_by_space(char *line)
 		unclosed_quote_err(spl_list);
 	if (start_i != line_i)
 		ft_lstadd_back(&spl_list, ft_lstnew(ft_substr(line, start_i, line_i - start_i)));
-	// ft_lstiter(spl_list, print);printf("\n");
+	ft_lstiter(spl_list, print);printf("\n");
 	return (spl_list);
 }
 
@@ -72,7 +72,7 @@ void	append_buff_to_list(char *buff, int *buf_i, t_list **token_list)
 {
 	buff[*buf_i] = '\0';
 	ft_lstadd_back(token_list, ft_lstnew(ft_strdup(buff)));
-	ft_bzero(buff, ft_strlen(buff));
+	ft_bzero(buff, ft_strlen(buff) + 1);
 	*buf_i = 0;
 }
 
@@ -111,7 +111,7 @@ t_list *divide_line_into_token(char *line)
 	
 
 	// cat <infile |cat -e>"out file" -> [ cat ] [ <infile ] [ |cat ] [ -e>"out file" ]
-	spl_list = split_line_by_space(line); // malloc
+	spl_list = split_by_space(line); // malloc
 	spl_cur = spl_list;
 	while (spl_cur) {
 		// [ -e>"out file" ] -> [ -e ] [ > ] [ "out file" ]

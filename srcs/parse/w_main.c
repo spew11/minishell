@@ -61,7 +61,8 @@ int main(int argc, char *argv[], char *envp[])
 	line = readline("minishell$ ");
 
 	cmd_arr = parse_line(line, &pipe_num, env_lst);
-	// here_doc(cmd_arr, pipe_num);
+	here_doc(cmd_arr, pipe_num);
+	print_cmd_arr(cmd_arr, pipe_num);
 }
 
 /* 에러 메모
