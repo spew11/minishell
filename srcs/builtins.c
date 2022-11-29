@@ -1,4 +1,10 @@
 #include "minishell.h"
+int ft_exit(int argc, char *argv[]) {
+	if (argc == 1) {
+		exit(0);
+	}
+	return (0);
+}
 
 int echo(int argc, char *argv[], t_var_lst *env_lst)
 {
@@ -115,7 +121,7 @@ int export(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst) 
 	return (0);
 }
 
-int unset(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst) {
+int unset(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst) {
 	int i = 1;
 	while (i < argc) {
 		if (chk_var_name(argv[i])) {

@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-char **env_lst2env_arr(t_var_lst *env_lst) {
+char **env_lst2arr(t_var_lst *env_lst) {
 	char **envp = 0;
 	if (!env_lst) {
 		return envp;
@@ -185,5 +185,5 @@ t_var_lst *init_var_lst(char *envp[]) {
 		now = now->next;
 		i++;
 	}
-	return head;
+	return (head);
 }

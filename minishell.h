@@ -18,18 +18,36 @@
 # define OUTFILE 3 // '>'
 # define FILE_APPEND 4 // '>>'
 
+typedef struct s_var_lst {
+	char *var;
+	char *val;
+	struct s_var_lst *next;
+}				t_var_lst;
+
 typedef struct s_redir {
 	int		type;
 	char	*str;
 } t_redir;
 
+typedef struct s_externs {
+	t_var_lst *env_lst;
+	t_var_lst *export_lst;
+	char	**env_arr;
+}			t_externs;
+
 typedef struct s_cmd_info {
+	char	**env_arr;
 	int		argc;
 	char	**argv;
 	int		redir_num;
 	t_redir *redir;
 	char **tmpfiles;
 } t_cmd_info;
+
+typedef struct s_shell_info {
+	int exit_flag;
+	
+}			t_shell_info;
 
 enum	e_opt {
 	ARGC,
@@ -43,35 +61,31 @@ void	print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num);
 
 int exit_status;
 
-typedef struct s_var_lst {
-	char *var;
-	char *val;
-	struct s_var_lst *next;
-}				t_var_lst;
-
 void	sig_handler(int signal);
 void	signal_on(void);
 
 void		chk_fork_err(int pid);
 void		chk_fd_err(int fd);
 
-void ft_execve(char *argv[], t_var_lst *env_lst);
+void ft_execve(char *argv[], char *envp[]);
 int	ft_access(const char *pathname);
-int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_var_lst *env_lst);
-
+void run_binary(int argc, char *argv[], t_externs *externs);
+int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, int idx, t_externs *externs);
 int echo(int argc, char *argv[], t_var_lst *env_lst);
 int cd(int argc, char *argv[], t_var_lst *env_lst);
 t_var_lst *init_var_lst(char *envp[]);
 void print_var_lst(t_var_lst *var_lst);
 char **ft_slice(char *str, char sep);
-int export(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst);
+int export(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst);
 void sort_var_lst(t_var_lst *var_lst);
 void add_var_lst(t_var_lst **var_lst, char *var, char *val);
 char *ft_getenv(t_var_lst *env_lst, char *var);
 int env(int argc, char *argv[], t_var_lst *env_lst);
 int remove_var_lst(t_var_lst **var_lst, char *var);
+int pwd(void);
 int unset(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst);
 int chk_var_name(char *var_name);
 void var_name_err(void);
-char **env_lst2env_arr(t_var_lst *env_lst);
+char **env_lst2arr(t_var_lst *env_lst);
+int ft_exit(int argc, char *argv[]);
 #endif
