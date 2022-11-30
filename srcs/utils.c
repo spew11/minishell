@@ -7,7 +7,7 @@ int chk_var_name(char *var_name) {
 			var_name_err();
 			return (0);
 		}
-		if (!ft_isalnum(var_name[i]) && !var_name[i] == '_') {
+		if (!ft_isalnum(var_name[i]) && var_name[i] != '_') {
 			var_name_err();
 			return (0);
 		}

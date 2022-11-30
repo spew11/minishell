@@ -1,5 +1,26 @@
 #include "minishell.h"
 
+t_var_lst *copy_lst(t_var_lst *var_lst) {
+	t_var_lst *cp_lst;
+	t_var_lst *head;
+	if (var_lst) {
+		head = (t_var_lst *)malloc(sizeof(t_var_lst) * 1);
+		head->var = ft_strdup(var_lst->var);
+		head->val = ft_strdup(var_lst->val);
+		head->next = 0;
+	}
+	cp_lst = head;
+	while (var_lst->next) {
+		var_lst = var_lst->next;
+		head->next = (t_var_lst *)malloc(sizeof(t_var_lst) * 1);
+		head->next->var = ft_strdup(var_lst->var);
+		head->next->val = ft_strdup(var_lst->val);
+		head->next->next = 0;
+		head = head->next;
+	}
+	return cp_lst;
+}
+
 char **env_lst2arr(t_var_lst *env_lst) {
 	char **envp = 0;
 	if (!env_lst) {
@@ -128,7 +149,7 @@ void sort_var_lst(t_var_lst *var_lst) {
 	while (seat->next) {
 		min = seat;
 		ptr = seat->next;
-		while (ptr->next) {
+		while (ptr) {
 			if (ft_strncmp(min->var, ptr->var, -1) > 0) {
 				min = ptr;
 			}

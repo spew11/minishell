@@ -89,4 +89,5 @@ void var_name_err(void);
 char **env_lst2arr(t_var_lst *env_lst);
 int ft_exit(int argc, char *argv[]);
 int print_exit(void);
+t_var_lst*copy_lst(t_var_lst *var_lst);
 #endif

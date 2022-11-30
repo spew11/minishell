@@ -89,18 +89,20 @@ static char **get_var_val(char *str){
 	char *val = strs[1];
 
 	if (var[0] == 0) { //=happy가 들어온 경우
+		ft_putstr_fd("not a valid identifier\n", 2);
 		return (0);
 	}
-	if (val[1] == 0) { //happy=가 들어온 경우
+	if (val[0] == '\0') { //happy=가 들어온 경우
 		strs[1] = "\"\"";
 	}
 	return (strs);
 }
 
-int export(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst) {
+int export(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst) {
 	char **var_val;
-
+	int ret = 0;
 	if (argc == 1) {
+		sort_var_lst(*export_lst);
 		print_var_lst(*export_lst);
 	}
 	else {
@@ -112,17 +114,22 @@ int export(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst) 
 					add_var_lst(export_lst, var_val[0], var_val[1]);
 					add_var_lst(env_lst, var_val[0], var_val[1]);
 				}
+				else {
+					ret = 1;
+				}
 			}
 			else {
 				if (chk_var_name(argv[i])) {
 					add_var_lst(export_lst, argv[i], 0);
 				}
+				else {
+					ret = 1;
+				}
 			}
 			i++;
 		}
-		sort_var_lst(*export_lst);
 	}
-	return (0);
+	return (ret);
 }
 
 int unset(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst) {
