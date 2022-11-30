@@ -1,4 +1,8 @@
 #include "minishell.h"
+int print_exit(void) {
+	printf("%d\n", exit_status);
+	return (0);
+}
 int ft_exit(int argc, char *argv[]) {
 	if (argc == 1) {
 		exit(0);

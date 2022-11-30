@@ -70,7 +70,7 @@ void		chk_fd_err(int fd);
 void ft_execve(char *argv[], char *envp[]);
 int	ft_access(const char *pathname);
 void run_binary(int argc, char *argv[], t_externs *externs);
-int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, int idx, t_externs *externs);
+int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs);
 int echo(int argc, char *argv[], t_var_lst *env_lst);
 int cd(int argc, char *argv[], t_var_lst *env_lst);
 t_var_lst *init_var_lst(char *envp[]);
@@ -88,4 +88,5 @@ int chk_var_name(char *var_name);
 void var_name_err(void);
 char **env_lst2arr(t_var_lst *env_lst);
 int ft_exit(int argc, char *argv[]);
+int print_exit(void);
 #endif

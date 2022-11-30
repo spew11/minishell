@@ -16,13 +16,15 @@ int minishell(t_externs *externs) {
 			return (0);
 		}
 		if (*line == '\0') {
-			printf("here\n");
 			free(line);
 		}
 		else if (line) {
+			if (ft_strncmp(line, "exit", -1) == 0) {
+				return (0);
+			}
 			add_history(line);
 			cmd_infos = parse_line(line, &pipe_num, externs->env_arr);
-			run_cmds(cmd_infos, pipe_num, 0, externs);
+			run_cmds(cmd_infos, pipe_num, externs);
 			free(line);
 		}
 	}
@@ -39,6 +41,7 @@ int main(int argc, char *argv[], char *envp[]) {
     tcsetattr(0, TCSANOW, &term);
 	signal_on();
 	
+	exit_status = 0;
 	t_externs externs;
 	externs.env_lst = init_var_lst(envp);
 	externs.export_lst = init_var_lst(envp);
