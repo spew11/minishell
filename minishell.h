@@ -5,6 +5,7 @@
 # include <readline/history.h>
 # include <signal.h>
 # include <string.h>
+# include <errno.h>
 # include <stdlib.h>
 # include <termios.h>
 # include <sys/types.h>
@@ -86,4 +87,6 @@ char **env_lst2arr(t_var_lst *env_lst);
 int ft_exit(int argc, char *argv[]);
 int print_exit(void);
 t_var_lst*copy_lst(t_var_lst *var_lst);
+int is_builtin(char *cmd);
+int exec_builtin(int argc, char *argv[], t_var_lst *env_lst, t_var_lst *export_lst);
 #endif
