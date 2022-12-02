@@ -141,7 +141,7 @@ t_cmd_info	*init_cmd_info_arr(t_list *el_list, int pipe_num)
 	while (cur) {
 		if (!ft_strncmp(cur -> content, "|", 2)) {
 			init_cmd_info(cmd_info_arr + cmd_i, cnt[ARGC], cnt[REDIR]); // malloc ...err체크해야함?
-			printf("[argc: %d, redir: %d]\n", cnt[ARGC], cnt[REDIR]);
+			//printf("[argc: %d, redir: %d]\n", cnt[ARGC], cnt[REDIR]);
 			if (!ft_strncmp(cur->next->content, "|", 2))
 				flag_err(cur->next->content);
 			cnt[ARGC] = 0;
@@ -160,7 +160,7 @@ t_cmd_info	*init_cmd_info_arr(t_list *el_list, int pipe_num)
 	}
 	// 파이프의 마지막 or 파이프가 없는 상항 malloc
 	init_cmd_info(cmd_info_arr + cmd_i, cnt[ARGC], cnt[REDIR]); // malloc
-	printf("[argc: %d, redir: %d]\n", cnt[ARGC], cnt[REDIR]);
+	//printf("[argc: %d, redir: %d]\n", cnt[ARGC], cnt[REDIR]);
 	// cmd_info_arr은 마지막에 null을 넣지않고 pipe_num으로 다뤄줘야한다.
 	return (cmd_info_arr);
 }
@@ -226,7 +226,7 @@ t_cmd_info	*parse_line(char *line, int *pipe_num, char *envp[])
 
 	// 역할에 구분없이 그냥 쪼개서 리스트에 담는다.
 	// line -> el_list
-	el_list = get_element_list(line, envp); ft_lstiter(el_list, print);printf("\n"); //malloc
+	el_list = get_element_list(line, envp); //ft_lstiter(el_list, print);printf("\n"); //malloc
 	
 	// el_list -> cmd_info_arr
 	*pipe_num = count_pipe(el_list);

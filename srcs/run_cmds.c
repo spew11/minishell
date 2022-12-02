@@ -39,7 +39,7 @@ int exec_builtin(int argc, char *argv[], t_var_lst *env_lst, t_var_lst *export_l
 	return 1;
 }
 
-int run_cmd(t_cmd_info *cmd_info, t_externs *externs)
+int run_cmd(t_cmd_info *cmd_info, t_externs *externs, int exit_flag)
 {
 	int in_fd;
 	int out_fd;
@@ -53,8 +53,10 @@ int run_cmd(t_cmd_info *cmd_info, t_externs *externs)
 		filename = cmd_info->redir[i].str;
 		if (type == 1) {
 			if (ft_access(filename) == -1) {
-				ft_putstr_fd("No such file or directory\n", 2);
-				exit(1);
+				perror("minishell");
+				//ft_putstr_fd("No such file or directory\n", 2);
+				exit_status = 1;
+				return (1);
 			}
 			in_fd = open(filename, O_RDONLY, 0644);
 			chk_fd_err(in_fd);
@@ -73,12 +75,20 @@ int run_cmd(t_cmd_info *cmd_info, t_externs *externs)
 		i++;
 	}
 	if (is_builtin(cmd_info->argv[0])) {
+		printf("here2\n");
 		ret = exec_builtin(cmd_info->argc, cmd_info->argv, externs->env_lst, externs->export_lst);
+		return (ret);
 	}
 	else {
-		ft_execve(cmd_info->argv, externs->env_arr);
+		ft_putstr_fd("exe\n", 2);
+		ft_putnbr_fd(getpid(), 2);
+		int pid = fork();
+		if (pid == 0)
+			ft_execve(cmd_info->argv, externs->env_arr);
+		else {
+			waitpid(pid, 0, 0);
+		}
 	}
-	exit(ret);
 	return (0);
 }
 
@@ -93,6 +103,7 @@ int is_sticky_builtin(char *cmd) {
 }
 
 int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs) {
+	int temp[2];
 	int in_fd = -1;
 	int tmp_fd = -1;
 	int out_fd[2] = {0, 1};
@@ -101,20 +112,27 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs) {
 		if (idx < pipe_num) { // idx번째 프로세스 뒤에 pipe가 있음
 			pipe(out_fd);
 		}
-		if (idx == 0 && is_sticky_builtin(cmd_infos[idx].argv[0])) {
-			if (pipe_num > 0) {
+		if (pipe_num == 0) {
+			/*if (pipe_num > 0) {
 				tmp_fd = dup(1);
 				dup2(out_fd[1], 1);
-			}
-			exit_status = exec_builtin(cmd_infos[idx].argc, cmd_infos[idx].argv, externs->env_lst, externs->export_lst);
-			if (pipe_num > 0) {
+			}*/
+			ft_putstr_fd("here\n", 2);
+			temp[0] = dup(0);
+			temp[1] = dup(1);
+			exit_status = run_cmd(cmd_infos + idx, externs, 0);
+			dup2(temp[0], 0);
+			dup2(temp[1], 1);
+			/*if (pipe_num > 0) {
 				dup2(tmp_fd, 1);
 				close(out_fd[1]);
 				in_fd = out_fd[0];
-			}
+			}*/
 		}
 		else {
-			pid_t pid = fork();
+			ft_putstr_fd("fork\n", 2);
+			
+			pid_t pid = fork(); // pipe에 대한 fork
 			int status;
 			if (pid == 0) {
 				if (idx < pipe_num) {
@@ -124,7 +142,8 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs) {
 				if (in_fd != -1) {
 					dup2(in_fd, 0);  // 내(방금 포크 뜬 자식 프로세스)의 입력은 STDIN이  아니라, in_fd(지난번 while step에서의 out_fd[0])에서 가져올거야
 				}
-				run_cmd(cmd_infos + idx, externs);
+				run_cmd(cmd_infos + idx, externs, 1);
+				exit(0); // pipe에 대한  exit
 			}
 			else {
 				int end_pid = waitpid(pid, &status, 0);
@@ -145,5 +164,21 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs) {
 		}
 		idx++;
 	}
+/*	waitpid(end_pid, &status, 0);
+	exit_status = WEXITSTATUS(status);
+	while (wait() >= 0)
+		;
+
+	while (i <= pipe_num)
+		waitpid(pid[i], &status, 0);
+	exit_status = WEXITSTATUS(status);
+
+	int end_pid = waitpid(pid, &status, 0);
+	if (end_pid != pid) {
+		return (1);
+	}
+	else {
+		exit_status = WEXITSTATUS(status);
+	}*/
 	return (0);
 }

@@ -51,6 +51,7 @@ int cd(int argc, char *argv[], t_var_lst *env_lst) {
 		return (1);
 	}
 	if (argc == 1) {
+		ft_putstr_fd("here3\n", 2);
 		chdir(home_path);
 	}
 	else {
