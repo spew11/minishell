@@ -1,5 +1,4 @@
 #include "minishell.h"
-
 int is_builtin(char *cmd) {
 	if (ft_strncmp(cmd, "echo", -1) == 0)
 		return 1;
@@ -93,12 +92,12 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs) {
 		if (idx < pipe_num) { // idx번째 프로세스 뒤에 pipe가 있음
 			pipe(out_fd);
 		}
-		if (idx == 0 && is_builtin(cmd_infos[idx].argv[0])) {
+		if (idx == 0 && ft_strncmp(cmd_infos[idx].argv[0], "cd", -1) == 0) {
 			if (pipe_num > 0) {
 				tmp_fd = dup(1);
 				dup2(out_fd[1], 1);
 			}
-			exit_status = exec_builtin(cmd_infos[idx].argc, cmd_infos[idx].argv, externs->env_lst, externs->export_lst);
+			exit_status  = exec_builtin(cmd_infos[idx].argc, cmd_infos[idx].argv, externs->env_lst, externs->export_lst);
 			if (pipe_num > 0) {
 				dup2(tmp_fd, 1);
 				close(out_fd[1]);
