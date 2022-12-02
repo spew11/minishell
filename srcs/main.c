@@ -6,8 +6,6 @@ int minishell(t_externs *externs) {
 	int		pipe_num;
 	t_cmd_info	*cmd_infos;
 
-	t_shell_info shell_info;
-	shell_info.exit_flag = 0;
 	while (1) {
 		line = readline("minishell$ ");
 		if (!line) {

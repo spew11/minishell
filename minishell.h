@@ -44,11 +44,6 @@ typedef struct s_cmd_info {
 	char **tmpfiles;
 } t_cmd_info;
 
-typedef struct s_shell_info {
-	int exit_flag;
-	
-}			t_shell_info;
-
 enum	e_opt {
 	ARGC,
 	REDIR,

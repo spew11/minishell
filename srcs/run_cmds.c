@@ -37,6 +37,7 @@ int exec_builtin(int argc, char *argv[], t_var_lst *env_lst, t_var_lst *export_l
 		return ft_exit(argc, argv);
 	if (ft_strncmp(argv[0], "print_exit", -1) == 0)
 		return print_exit();
+	return 1;
 }
 
 int run_cmd(t_cmd_info *cmd_info, t_externs *externs)
@@ -86,7 +87,7 @@ int run_cmd(t_cmd_info *cmd_info, t_externs *externs)
 int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs) {
 	int in_fd = -1;
 	int tmp_fd = -1;
-	int out_fd[2] = {-1, -1};
+	int out_fd[2] = {0, 1};
 	int idx = 0;
 	while (idx <= pipe_num) {
 		if (idx < pipe_num) { // idx번째 프로세스 뒤에 pipe가 있음
@@ -125,8 +126,10 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs) {
 				else {
 					exit_status = WEXITSTATUS(status);
 				}
-				in_fd = out_fd[0];
-				close(out_fd[1]);
+				if (idx < pipe_num) {
+					in_fd = out_fd[0];
+					close(out_fd[1]);
+				}
 			}
 		}
 		if (exit_status != 0) {
