@@ -22,7 +22,8 @@ int minishell(t_externs *externs) {
 				return (0);
 			}
 			add_history(line);
-			cmd_infos = parse_line(line, &pipe_num, externs->env_arr);
+			cmd_infos = parse_line(line, &pipe_num, externs->env_lst);
+			here_doc(cmd_infos, pipe_num);
 			ret = run_cmds(cmd_infos, pipe_num, externs);
 			free(line);
 		}

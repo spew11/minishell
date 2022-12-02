@@ -36,12 +36,12 @@ typedef struct s_externs {
 }			t_externs;
 
 typedef struct s_cmd_info {
-	char	**env_arr;
 	int		argc;
 	char	**argv;
 	int		redir_num;
 	t_redir *redir;
-	char **tmpfiles;
+	int		here_num;
+	char	**here;
 } t_cmd_info;
 
 enum	e_opt {
@@ -49,7 +49,8 @@ enum	e_opt {
 	REDIR,
 };
 
-t_cmd_info	*parse_line(char *line, int *pipe_num, char *envp[]);
+t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst);
+void	here_doc(t_cmd_info *cmd_arr, int pipe_num);
 //temp
 void print(void *ptr);
 void	print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num);

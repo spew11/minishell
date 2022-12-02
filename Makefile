@@ -31,6 +31,10 @@ MINISHELL = main.c \
 			parse_line.c \
 			w_utils.c \
 			run_cmds.c \
+			div_line.c\
+			fill_cmd_info.c\
+			init_cmd_info.c\
+			heredoc.c
 
 SRCS = $(addprefix srcs/, $(MINISHELL))
 OBJS = $(SRCS:%.c=%.o)

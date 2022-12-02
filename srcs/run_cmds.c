@@ -74,22 +74,24 @@ int run_cmd(t_cmd_info *cmd_info, t_externs *externs, int exit_flag)
 		}
 		i++;
 	}
+	int status;
 	if (is_builtin(cmd_info->argv[0])) {
-		printf("here2\n");
 		ret = exec_builtin(cmd_info->argc, cmd_info->argv, externs->env_lst, externs->export_lst);
 		return (ret);
 	}
 	else {
-		ft_putstr_fd("exe\n", 2);
-		ft_putnbr_fd(getpid(), 2);
 		int pid = fork();
 		if (pid == 0)
 			ft_execve(cmd_info->argv, externs->env_arr);
 		else {
-			waitpid(pid, 0, 0);
+			if (waitpid(pid, &status, 0) != pid) {
+				return (1);
+			}
+			else {
+				return (WEXITSTATUS(status));
+			}
 		}
 	}
-	return (0);
 }
 
 int is_sticky_builtin(char *cmd) {
@@ -108,6 +110,9 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs) {
 	int tmp_fd = -1;
 	int out_fd[2] = {0, 1};
 	int idx = 0;
+	pid_t pid = -1;
+	int status;
+	int ret;
 	while (idx <= pipe_num) {
 		if (idx < pipe_num) { // idx번째 프로세스 뒤에 pipe가 있음
 			pipe(out_fd);
@@ -117,7 +122,6 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs) {
 				tmp_fd = dup(1);
 				dup2(out_fd[1], 1);
 			}*/
-			ft_putstr_fd("here\n", 2);
 			temp[0] = dup(0);
 			temp[1] = dup(1);
 			exit_status = run_cmd(cmd_infos + idx, externs, 0);
@@ -130,10 +134,7 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs) {
 			}*/
 		}
 		else {
-			ft_putstr_fd("fork\n", 2);
-			
-			pid_t pid = fork(); // pipe에 대한 fork
-			int status;
+			pid = fork(); // pipe에 대한 fork
 			if (pid == 0) {
 				if (idx < pipe_num) {
 					dup2(out_fd[1], 1);  // 내(방금 포크 뜬 자식 프로세스) 출력은 STDOUT이 아니라, out_fd[1]에 갈 거야
@@ -142,17 +143,17 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs) {
 				if (in_fd != -1) {
 					dup2(in_fd, 0);  // 내(방금 포크 뜬 자식 프로세스)의 입력은 STDIN이  아니라, in_fd(지난번 while step에서의 out_fd[0])에서 가져올거야
 				}
-				run_cmd(cmd_infos + idx, externs, 1);
-				exit(0); // pipe에 대한  exit
+				ret = run_cmd(cmd_infos + idx, externs, 1);
+				exit(ret); // pipe에 대한  exit
 			}
 			else {
-				int end_pid = waitpid(pid, &status, 0);
-				if (end_pid != pid) {
-					return (1);
-				}
-				else {
-					exit_status = WEXITSTATUS(status);
-				}
+				// int end_pid = waitpid(pid, &status, 0);
+				// if (end_pid != pid) {
+				// 	return (1);
+				// }
+				// else {
+				// 	exit_status = WEXITSTATUS(status);
+				// }
 				if (idx < pipe_num) {
 					in_fd = out_fd[0];
 					close(out_fd[1]);
@@ -164,21 +165,21 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs) {
 		}
 		idx++;
 	}
-/*	waitpid(end_pid, &status, 0);
+	waitpid(pid, &status, 0);
 	exit_status = WEXITSTATUS(status);
-	while (wait() >= 0)
+	while (wait(NULL) >= 0)
 		;
 
-	while (i <= pipe_num)
-		waitpid(pid[i], &status, 0);
-	exit_status = WEXITSTATUS(status);
+	// while (i <= pipe_num)
+	// 	waitpid(pid[i], &status, 0);
+	// exit_status = WEXITSTATUS(status);
 
-	int end_pid = waitpid(pid, &status, 0);
-	if (end_pid != pid) {
-		return (1);
-	}
-	else {
-		exit_status = WEXITSTATUS(status);
-	}*/
+	// int end_pid = waitpid(pid, &status, 0);
+	// if (end_pid != pid) {
+	// 	return (1);
+	// }
+	// else {
+	// 	exit_status = WEXITSTATUS(status);
+	// }
 	return (0);
 }
