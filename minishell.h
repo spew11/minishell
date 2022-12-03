@@ -64,7 +64,7 @@ void	signal_on(void);
 void		chk_fork_err(int pid);
 void		chk_fd_err(int fd);
 
-void ft_execve(char *argv[], char *envp[]);
+int ft_execve(char *argv[], char *envp[]);
 int	ft_access(const char *pathname);
 void run_binary(int argc, char *argv[], t_externs *externs);
 int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs);
@@ -84,9 +84,11 @@ int unset(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst);
 int chk_var_name(char *var_name);
 void var_name_err(void);
 char **env_lst2arr(t_var_lst *env_lst);
-int ft_exit(int argc, char *argv[]);
-int print_exit(void);
+void ft_exit(int argc, char *argv[]);
 t_var_lst*copy_lst(t_var_lst *var_lst);
 int is_builtin(char *cmd);
 int exec_builtin(int argc, char *argv[], t_var_lst *env_lst, t_var_lst *export_lst);
+void clear_externs(t_externs *externs);
+void clear_var_lst(t_var_lst *var_lst);
+void free_double_arr(char **arr);
 #endif

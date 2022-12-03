@@ -1,13 +1,12 @@
 #include "minishell.h"
-int print_exit(void) {
-	printf("%d\n", exit_status);
-	return (0);
-}
-int ft_exit(int argc, char *argv[]) {
-	if (argc == 1) {
-		exit(0);
+
+void ft_exit(int argc, char *argv[]) {
+	ft_putendl_fd("exit", 1);
+	if (argc > 1) {
+		ft_putendl_fd("numeric argument required", 2);
+		exit(2);
 	}
-	return (0);
+	exit(0);
 }
 
 int echo(int argc, char *argv[], t_var_lst *env_lst)
@@ -22,13 +21,6 @@ int echo(int argc, char *argv[], t_var_lst *env_lst)
 	}
 	while (i < argc) {
 		str = argv[i];
-		if (ft_strlen(argv[i]) > 1 && argv[i][0] == '$') {
-			str = ft_getenv(env_lst, argv[i] + 1);
-			if (str == 0) {
-				i++;
-				continue;
-			}
-		}
 		printf("%s", str);
 		if (i < argc - 1) {
 			printf(" ");
@@ -38,7 +30,6 @@ int echo(int argc, char *argv[], t_var_lst *env_lst)
 	if (!opt_f) {
 		printf("\n");
 	}
-	exit_status = 0;
 	return (0);
 }
 
@@ -47,11 +38,9 @@ int cd(int argc, char *argv[], t_var_lst *env_lst) {
 
 	if (argc > 2) {
 		ft_putstr_fd("too many arguments\n", 2);
-		exit_status = 1;
 		return (1);
 	}
 	if (argc == 1) {
-		ft_putstr_fd("here3\n", 2);
 		chdir(home_path);
 	}
 	else {
@@ -63,8 +52,7 @@ int cd(int argc, char *argv[], t_var_lst *env_lst) {
 			}
 			else {
 				if (ft_access(paths[i]) < 0) {
-					ft_putstr_fd("No such file or directory\n", 2);
-					exit_status = 1;
+					ft_putendl_fd(strerror(errno), 2);
 					return (1);
 				}
 				chdir(paths[i]);
@@ -72,12 +60,10 @@ int cd(int argc, char *argv[], t_var_lst *env_lst) {
 			i++;
 		}
 	}
-	exit_status = 0;
 	return (0);
 }
 
 int pwd(void) {
-	//linux path maximum length is 4096
 	char buf[4096];
 	getcwd(buf, 4096);
 	printf("%s\n", buf);
@@ -89,11 +75,11 @@ static char **get_var_val(char *str){
 	char *var = strs[0];
 	char *val = strs[1];
 
-	if (var[0] == 0) { //=happy가 들어온 경우
-		ft_putstr_fd("not a valid identifier\n", 2);
+	if (var[0] == 0) {
+		ft_putendl_fd("not a valid identifier", 2);
 		return (0);
 	}
-	if (val[0] == '\0') { //happy=가 들어온 경우
+	if (val[0] == '\0') {
 		strs[1] = "\"\"";
 	}
 	return (strs);
@@ -118,6 +104,7 @@ int export(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst) 
 				else {
 					ret = 1;
 				}
+				free(var_val);
 			}
 			else {
 				if (chk_var_name(argv[i])) {
@@ -147,7 +134,7 @@ int unset(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst) {
 
 int env(int argc, char *argv[], t_var_lst *env_lst) {
 	if (argc != 1) {
-		ft_putstr_fd("too many arguments\n", 2);
+		ft_putendl_fd("too many arguments", 2);
 		return (1);
 	}
 	print_var_lst(env_lst);

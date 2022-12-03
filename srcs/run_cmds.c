@@ -1,68 +1,6 @@
 #include "minishell.h"
 
-int run_cmd(t_cmd_info *cmd_info, t_externs *externs)
-{
-	int in_fd;
-	int out_fd;
-	int type = 0;
-	char *filename;
-	int ret = 0;
-
-	int i = 0;
-	while (i < cmd_info->redir_num) {
-		type = cmd_info->redir[i].type;
-		filename = cmd_info->redir[i].str;
-		if (type == INFILE || type == HERE_DOC) {
-			if (ft_access(filename) == -1) {
-				ft_putendl_fd(strerror(ENOENT), 2);
-				return (1);
-			}
-			in_fd = open(filename, O_RDONLY, 0644);
-			if (in_fd < 0) {
-				ft_putendl_fd("Failed to open file", 2);
-				return (1);
-			}
-			dup2(in_fd, 0);
-		}
-		else {
-			if (type == OUTFILE) {
-				out_fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644);
-			}
-			else if (type == FILE_APPEND) {
-				out_fd = open(filename, O_WRONLY | O_TRUNC | O_APPEND | O_CREAT, 0644);
-			}
-			if (out_fd < 0) {
-				ft_putendl_fd("Failed to open file", 2);
-				return (1);
-			}
-			dup2(out_fd, 1);
-		}
-		i++;
-	}
-	int status;
-	if (is_builtin(cmd_info->argv[0])) {
-		return (exec_builtin(cmd_info->argc, cmd_info->argv, externs->env_lst, externs->export_lst));
-	}
-	else {
-		int pid = fork();
-		if (pid < 0) {
-			ft_putendl_fd("Failed to fork child process", 2);
-			return (1);
-		}
-		if (pid == 0) {
-			ft_execve(cmd_info->argv, externs->env_arr);
-		}
-		else {
-			if (waitpid(pid, &status, 0) != pid) {
-				ft_putendl_fd(strerror(ECHILD), 2);
-				return (1);
-			}
-			return (WEXITSTATUS(status));
-		}
-	}
-}
-
-void unlink_tmpfiles(t_cmd_info *cmd_infos, int pipe_num) {
+static void unlink_tmpfiles(t_cmd_info *cmd_infos, int pipe_num) {
 	int idx = 0;
 	while (idx <= pipe_num) {
 		int j = 0;
@@ -77,7 +15,7 @@ void unlink_tmpfiles(t_cmd_info *cmd_infos, int pipe_num) {
 	return ;
 }
 
-void wait_pids(pid_t *pid_arr, int pipe_num) {
+static void wait_pids(pid_t *pid_arr, int pipe_num) {
 	int status;
 	int idx = 0;
 	if (pipe_num > 0) {
@@ -93,6 +31,81 @@ void wait_pids(pid_t *pid_arr, int pipe_num) {
 	return ;
 }
 
+static int run_cmd(t_cmd_info *cmd_info, t_externs *externs)
+{
+	int in_fd = -1;
+	int out_fd = -1;
+	int type = 0;
+	char *filename;
+	int ret = 0;
+
+	int i = 0;
+	while (i < cmd_info->redir_num) {
+		type = cmd_info->redir[i].type;
+		filename = cmd_info->redir[i].str;
+		if (type == INFILE || type == HERE_DOC) {
+			if (ft_access(filename) == -1) {
+				ft_putendl_fd(strerror(errno), 2);
+				return (1);
+			}
+			if (in_fd != -1) {
+				close(in_fd);
+			}
+			in_fd = open(filename, O_RDONLY, 0644);
+			if (in_fd < 0) {
+				ft_putendl_fd("Failed to open file", 2);
+				return (1);
+			}
+			dup2(in_fd, 0);
+		}
+		else {
+			if (type == OUTFILE) {
+				if (out_fd != -1) {
+					close(out_fd);
+				}
+				out_fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+			}
+			else if (type == FILE_APPEND) {
+				if (out_fd != -1) {
+					close(out_fd);
+				}
+				out_fd = open(filename, O_WRONLY | O_TRUNC | O_APPEND | O_CREAT, 0644);
+			}
+			if (out_fd < 0) {
+				ft_putendl_fd("Failed to open file", 2);
+				return (1);
+			}
+			dup2(out_fd, 1);
+		}
+		i++;
+	}
+	int status;
+	if (is_builtin(cmd_info->argv[0])) {
+		ret = exec_builtin(cmd_info->argc, cmd_info->argv, externs->env_lst, externs->export_lst);
+	}
+	else {
+		int pid = fork();
+		if (pid < 0) {
+			ft_putendl_fd(strerror(errno), 2);
+			return (1);
+		}
+		if (pid == 0) {
+			ft_execve(cmd_info->argv, externs->env_arr);
+		}
+		else {
+			if (waitpid(pid, &status, 0) != pid) {
+				ft_putendl_fd(strerror(errno), 2);
+				return (1);
+			}
+			ret = WEXITSTATUS(status);
+		}
+	}
+	close(in_fd);
+	close(out_fd);
+	return (ret);
+}
+
+
 int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs)
 {
 	int temp[2];
@@ -101,7 +114,7 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs)
 
 	pid_t *pid_arr = (int *)malloc(sizeof(int) * (pipe_num + 1));
 	if (pid_arr < 0) {
-		ft_putendl_fd(strerror(ENOMEM), 2);
+		ft_putendl_fd(strerror(errno), 2);
 		return (-1);
 	}
 	int idx = 0;
@@ -112,14 +125,14 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs)
 		if (pipe_num == 0) {
 			temp[0] = dup(0);
 			temp[1] = dup(1);
-			exit_status = run_cmd(cmd_infos + idx, externs, 0);
+			exit_status = run_cmd(cmd_infos + idx, externs);
 			dup2(temp[0], 0);
 			dup2(temp[1], 1);
 		}
 		else {
 			pid_arr[idx] = fork();
 			if (pid_arr[idx] < 0) {
-				ft_putendl_fd("Failed to fork child process", 2);
+				ft_putendl_fd(strerror(errno), 2);
 				return (1);
 			}
 			if (pid_arr[idx] == 0) {
@@ -130,7 +143,7 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs)
 				if (in_fd != -1) {
 					dup2(in_fd, 0);
 				}
-				exit(run_cmd(cmd_infos + idx, externs, 1));
+				exit(run_cmd(cmd_infos + idx, externs));
 			}
 			else {
 				if (idx < pipe_num) {
@@ -143,6 +156,6 @@ int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs)
 	}
 	wait_pids(pid_arr, pipe_num);
 	unlink_tmpfiles(cmd_infos, pipe_num);
-	//free();
+	free(pid_arr);
 	return (0);
 }

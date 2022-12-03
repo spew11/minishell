@@ -9,8 +9,6 @@ int minishell(t_externs *externs) {
 	while (1) {
 		line = readline("minishell$ ");
 		if (!line) {
-			//printf("\033[1A");
-			//printf("\033[11C");
 			printf("exit\n");
 			return (0);
 		}
@@ -18,17 +16,22 @@ int minishell(t_externs *externs) {
 			free(line);
 		}
 		else if (line) {
-			if (ft_strncmp(line, "exit", -1) == 0) {
-				return (0);
-			}
 			add_history(line);
 			cmd_infos = parse_line(line, &pipe_num, externs->env_lst);
 			here_doc(cmd_infos, pipe_num);
 			ret = run_cmds(cmd_infos, pipe_num, externs);
 			free(line);
+			//free_cmd_infos;
 		}
 	}
 	return (ret);
+}
+
+void clear_externs(t_externs *externs) {
+	clear_var_lst(externs->env_lst);
+	clear_var_lst(externs->export_lst);
+	free_double_arr(externs->env_arr);
+	return ;
 }
 
 int main(int argc, char *argv[], char *envp[]) {
@@ -48,6 +51,6 @@ int main(int argc, char *argv[], char *envp[]) {
 	externs.export_lst = init_var_lst(envp);
 	externs.env_arr = env_lst2arr(externs.env_lst);
 	ret = minishell(&externs);
-	//have to free all malloc
+	clear_externs(&externs);
 	return (ret);
 }

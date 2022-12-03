@@ -1,24 +1,14 @@
 #include "minishell.h"
 
-t_var_lst *copy_lst(t_var_lst *var_lst) {
-	t_var_lst *cp_lst;
-	t_var_lst *head;
-	if (var_lst) {
-		head = (t_var_lst *)malloc(sizeof(t_var_lst) * 1);
-		head->var = ft_strdup(var_lst->var);
-		head->val = ft_strdup(var_lst->val);
-		head->next = 0;
-	}
-	cp_lst = head;
-	while (var_lst->next) {
+void clear_var_lst(t_var_lst *var_lst) {
+	while (var_lst) {
+		t_var_lst *tmp = var_lst;
 		var_lst = var_lst->next;
-		head->next = (t_var_lst *)malloc(sizeof(t_var_lst) * 1);
-		head->next->var = ft_strdup(var_lst->var);
-		head->next->val = ft_strdup(var_lst->val);
-		head->next->next = 0;
-		head = head->next;
+		free(tmp->var);
+		free(tmp->val);
+		free(tmp);
 	}
-	return cp_lst;
+	return ;
 }
 
 char **env_lst2arr(t_var_lst *env_lst) {
@@ -88,12 +78,16 @@ int remove_var_lst(t_var_lst **var_lst, char *var) {
 	now = *var_lst;
 	if (ft_strncmp(now->var, var, -1) == 0) {
 		(*var_lst) = (*var_lst)->next;
+		free(now->var);
+		free(now->val);
 		free(now);
 		return (0);
 	}
 	while (now) {
 		if (ft_strncmp(now->var, var, -1) == 0) {
 			prev->next = now->next;
+			free(now->var);
+			free(now->val);
 			free(now);
 			return (0);
 		}
@@ -183,7 +177,6 @@ void print_var_lst(t_var_lst *var_lst) {
 	}
 	return ;
 }
-
 t_var_lst *init_var_lst(char *envp[]) {
 	int i = 1;
 	char **var_val;
@@ -195,6 +188,7 @@ t_var_lst *init_var_lst(char *envp[]) {
 	var_val = ft_slice(envp[0], '=');
 	head->var = var_val[0];
 	head->val = var_val[1];
+	free(var_val);
 	head->next = 0;
 	t_var_lst *now = head;
 	while (envp[i]) {
@@ -202,6 +196,7 @@ t_var_lst *init_var_lst(char *envp[]) {
 		var_val = ft_slice(envp[i], '=');
 		now->next->var = var_val[0];
 		now->next->val = var_val[1];
+		free(var_val);
 		now->next->next = 0;
 		now = now->next;
 		i++;

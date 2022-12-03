@@ -1,5 +1,15 @@
 #include "minishell.h"
 
+void free_double_arr(char **arr) {
+	int i = 0;
+	while (arr[i]) {
+		free(arr[i]);
+		i++;
+	}
+	free(arr);
+	return ;
+}
+
 int is_builtin(char *cmd) {
 	if (ft_strncmp(cmd, "echo", -1) == 0)
 		return 1;
@@ -32,7 +42,7 @@ int exec_builtin(int argc, char *argv[], t_var_lst *env_lst, t_var_lst *export_l
 	if (ft_strncmp(argv[0], "env", -1) == 0)
 		return env(argc, argv, env_lst);
 	if (ft_strncmp(argv[0], "exit", -1) == 0)
-		return ft_exit(argc, argv);
+		ft_exit(argc, argv);
 	return 1;
 }
 
@@ -40,11 +50,11 @@ int chk_var_name(char *var_name) {
 	int i = 0;
 	while (var_name[i]) {
 		if (i == 0 && ft_isdigit(var_name[i])) {
-			var_name_err();
+			ft_putendl_fd("not a valid identifier", 2);
 			return (0);
 		}
 		if (!ft_isalnum(var_name[i]) && var_name[i] != '_') {
-			var_name_err();
+			ft_putendl_fd("not a valid identifier", 2);
 			return (0);
 		}
 		i++;
@@ -69,8 +79,8 @@ char **ft_slice(char *str, char sep) {
 	}
 	strs = (char **)malloc(sizeof(char *) * 3);
 	strs[2] = 0;
-	strs[0] = (char *)malloc(sizeof(char) * (sep_idx));
-	strs[1] = (char *)malloc(sizeof(char) * (str_len - sep_idx + 1));
+	strs[0] = (char *)malloc(sizeof(char) * (sep_idx + 1));
+	strs[1] = (char *)malloc(sizeof(char) * (str_len - sep_idx));
 	ft_strlcpy(strs[0], str, sep_idx + 1);
 	ft_strlcpy(strs[1], str + sep_idx + 1, str_len - sep_idx);
 	return (strs);
@@ -101,15 +111,16 @@ static char *get_pathname(char *envp[], char *filename) {
 			}
 		}
 	}
-	ft_putstr_fd("command not found\n", 2);
-	exit(1);
 	return (0);
 }
 
-void ft_execve(char *argv[], char *envp[]) {
+int ft_execve(char *argv[], char *envp[]) {
 	char *pathname = get_pathname(envp, argv[0]);
-	execve(pathname, argv, envp);
-	return ;
+	if (execve(pathname, argv, envp) == -1) {
+		ft_putendl_fd(strerror(errno), 2);
+		exit (1);
+	}
+	return (0);
 }
 
 void sig_handler(int signal) {
