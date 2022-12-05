@@ -1,6 +1,6 @@
 #include "minishell.h"
 
-int minishell(t_externs *externs) {
+int minishell(t_shell_info *shell_info) {
 	int ret = 0;
 	char	*line;
 	int		pipe_num;
@@ -17,9 +17,9 @@ int minishell(t_externs *externs) {
 		}
 		else if (line) {
 			add_history(line);
-			cmd_infos = parse_line(line, &pipe_num, externs->env_lst);
+			cmd_infos = parse_line(line, &pipe_num, shell_info->externs->env_lst);
 			here_doc(cmd_infos, pipe_num);
-			ret = run_cmds(cmd_infos, pipe_num, externs);
+			ret = run_cmds(cmd_infos, pipe_num, shell_info);
 			free(line);
 			//free_cmd_infos;
 		}
@@ -27,10 +27,10 @@ int minishell(t_externs *externs) {
 	return (ret);
 }
 
-void clear_externs(t_externs *externs) {
-	clear_var_lst(externs->env_lst);
-	clear_var_lst(externs->export_lst);
-	free_double_arr(externs->env_arr);
+void clear_shell_info(t_shell_info *shell_info) {
+	clear_var_lst(shell_info->externs->env_lst);
+	clear_var_lst(shell_info->externs->export_lst);
+	free_double_arr(shell_info->externs->env_arr);
 	return ;
 }
 
@@ -46,11 +46,16 @@ int main(int argc, char *argv[], char *envp[]) {
 	signal_on();
 	
 	exit_status = 0;
-	t_externs externs;
-	externs.env_lst = init_var_lst(envp);
-	externs.export_lst = init_var_lst(envp);
-	externs.env_arr = env_lst2arr(externs.env_lst);
-	ret = minishell(&externs);
-	clear_externs(&externs);
+	t_shell_info shell_info;
+	shell_info.externs = (t_externs *)malloc(sizeof(t_externs) * 1);
+	if (shell_info.externs < 0) {
+		ft_putendl_fd(strerror(errno), 2);
+		return (1);
+	}
+	shell_info.externs->env_lst = init_var_lst(envp);
+	shell_info.externs->export_lst = init_var_lst(envp);
+	shell_info.externs->env_arr = env_lst2arr(shell_info.externs->env_lst);
+	ret = minishell(&shell_info);
+	clear_shell_info(&shell_info);
 	return (ret);
 }

@@ -1,22 +1,24 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
+#    Makefile_in_mac                                    :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/05 21:09:19 by eunjilee          #+#    #+#              #
-#    Updated: 2022/12/03 15:13:40 by eunjilee         ###   ########.fr        #
+#    Updated: 2022/12/05 16:23:22 by eunjilee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 
-CC = gcc
+CC = gcc -I .
 
 CCFLAGS = -Wall -Wextra -Werror
 
-CCFLAGS = -lreadline -I .
+CCFLAGS1 = -L /Users/eunjilee/.brew/opt/readline/lib -lreadline
+
+CCFLAGS2 = -I /Users/eunjilee/.brew/opt/readline/include
 
 LIBFT_NAME = libft.a
 LIBFT_DIR = libft/
@@ -41,13 +43,13 @@ LIBFT = $(addprefix $(LIBFT_DIR), $(LIBFT_NAME))
 all: $(NAME)
 
 .c.o :
-		$(CC) $(CCFLAGS) -c -o $(<:.c=.o) $<
+		$(CC) $(CCFLAGS2) -c -o $(<:.c=.o) $<
 
 $(LIBFT):
 		make -C $(LIBFT_DIR) bonus
 
 $(NAME): $(OBJS) $(LIBFT)
-		$(CC) $(OBJS) -lreadline -o $(NAME) $(LIBFT)
+		$(CC) $(CCFLAGS1) -o $(NAME) $(OBJS) $(LIBFT)
 
 clean:
 		rm -f $(OBJS)

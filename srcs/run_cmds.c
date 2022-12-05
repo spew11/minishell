@@ -1,28 +1,40 @@
 #include "minishell.h"
 
-static void unlink_tmpfiles(t_cmd_info *cmd_infos, int pipe_num) {
-	int idx = 0;
-	while (idx <= pipe_num) {
-		int j = 0;
-		while (j < cmd_infos[idx].here_num) {
-			if (unlink(cmd_infos[idx].here[j]) < 0) {
+static void	unlink_tmpfiles(t_cmd_info *cmd_infos, int pipe_num)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	while (i <= pipe_num)
+	{
+		j = 0;
+		while (j < cmd_infos[i].here_num)
+		{
+			if (unlink(cmd_infos[i].here[j]) < 0)
+			{
 				exit_status = -1;
 			}
 			j++;
 		}
-		idx++;
+		i++;
 	}
 	return ;
 }
 
-static void wait_pids(pid_t *pid_arr, int pipe_num) {
-	int status;
-	int idx = 0;
-	if (pipe_num > 0) {
+static void	wait_pids(pid_t *pid_arr, int pipe_num)
+{
+	int	status;
+	int	idx;
+
+	if (pipe_num > 0)
+	{
 		if (waitpid(pid_arr[pipe_num], &status, 0) != pid_arr[pipe_num])
 			exit_status = 1;
 		exit_status = WEXITSTATUS(status);
-		while (idx < pipe_num) {
+		idx = 0;
+		while (idx < pipe_num)
+		{
 			if (waitpid(pid_arr[idx], 0, 0) != pid_arr[idx])
 				exit_status = 1;
 			idx++;
@@ -31,7 +43,7 @@ static void wait_pids(pid_t *pid_arr, int pipe_num) {
 	return ;
 }
 
-static int run_cmd(t_cmd_info *cmd_info, t_externs *externs)
+static int	run_cmd(t_cmd_info *cmd_info, t_externs *externs)
 {
 	int in_fd = -1;
 	int out_fd = -1;
@@ -105,57 +117,77 @@ static int run_cmd(t_cmd_info *cmd_info, t_externs *externs)
 	return (ret);
 }
 
-
-int run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs)
+void	run_cmd_without_pipe(t_cmd_info *cmd_infos, int idx, t_externs *externs)
 {
-	int temp[2];
-	int in_fd = -1;
-	int out_fd[2];
+	int	temp[2];
 
-	pid_t *pid_arr = (int *)malloc(sizeof(int) * (pipe_num + 1));
-	if (pid_arr < 0) {
+	temp[0] = dup(0);
+	temp[1] = dup(1);
+	exit_status = run_cmd(cmd_infos + idx, externs);
+	dup2(temp[0], 0);
+	dup2(temp[1], 1);
+	return ;
+}
+
+int	run_cmd_with_pipe(t_cmd_info *cmd_infos, int pipe_num, int idx,
+	t_shell_info *shell_info)
+{
+	shell_info->pid_arr[idx] = fork();
+	if (shell_info->pid_arr[idx] < 0)
+	{
+		ft_putendl_fd(strerror(errno), 2);
+		return (1);
+	}
+	if (shell_info->pid_arr[idx] == 0)
+	{
+		if (idx < pipe_num)
+		{
+			dup2(shell_info->out_fd[1], 1);
+			close(shell_info->out_fd[0]);
+		}
+		if (shell_info->in_fd != -1) {
+			dup2(shell_info->in_fd, 0);
+			close(shell_info->in_fd);
+		}
+		exit(run_cmd(cmd_infos + idx, shell_info->externs));
+	}
+	else {
+		if (idx > 0) {
+			close(shell_info->in_fd);
+		}
+		if (idx < pipe_num) {
+			shell_info->in_fd = shell_info->out_fd[0];
+			close(shell_info->out_fd[1]);
+		}
+	}
+	return (0);
+}
+
+int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_shell_info *shell_info)
+{
+	int	idx;
+
+	shell_info->in_fd = -1;
+	shell_info->pid_arr = (int *)malloc(sizeof(int) * (pipe_num + 1));
+	if (shell_info->pid_arr < 0)
+	{
 		ft_putendl_fd(strerror(errno), 2);
 		return (-1);
 	}
-	int idx = 0;
-	while (idx <= pipe_num) {
-		if (idx < pipe_num) {
-			pipe(out_fd);
-		}
-		if (pipe_num == 0) {
-			temp[0] = dup(0);
-			temp[1] = dup(1);
-			exit_status = run_cmd(cmd_infos + idx, externs);
-			dup2(temp[0], 0);
-			dup2(temp[1], 1);
-		}
-		else {
-			pid_arr[idx] = fork();
-			if (pid_arr[idx] < 0) {
-				ft_putendl_fd(strerror(errno), 2);
+	idx = 0;
+	while (idx <= pipe_num)
+	{
+		if (idx < pipe_num)
+			pipe(shell_info->out_fd);
+		if (pipe_num == 0)
+			run_cmd_without_pipe(cmd_infos, idx, shell_info->externs);
+		else
+			if (run_cmd_with_pipe(cmd_infos, pipe_num, idx, shell_info))
 				return (1);
-			}
-			if (pid_arr[idx] == 0) {
-				if (idx < pipe_num) {
-					dup2(out_fd[1], 1);
-					close(out_fd[0]);
-				}
-				if (in_fd != -1) {
-					dup2(in_fd, 0);
-				}
-				exit(run_cmd(cmd_infos + idx, externs));
-			}
-			else {
-				if (idx < pipe_num) {
-					in_fd = out_fd[0];
-					close(out_fd[1]);
-				}
-			}
-		}
 		idx++;
 	}
-	wait_pids(pid_arr, pipe_num);
+	wait_pids(shell_info->pid_arr, pipe_num);
 	unlink_tmpfiles(cmd_infos, pipe_num);
-	free(pid_arr);
+	free(shell_info->pid_arr);
 	return (0);
 }

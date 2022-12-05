@@ -19,6 +19,7 @@
 # define OUTFILE 3 // '>'
 # define FILE_APPEND 4 // '>>'
 
+
 typedef struct s_var_lst {
 	char *var;
 	char *val;
@@ -35,6 +36,13 @@ typedef struct s_externs {
 	t_var_lst *export_lst;
 	char	**env_arr;
 }			t_externs;
+
+typedef struct s_shell_info {
+	int in_fd;
+	int out_fd[2];
+	pid_t *pid_arr;
+	t_externs *externs;
+}			t_shell_info;
 
 typedef struct s_cmd_info {
 	int		argc;
@@ -67,7 +75,7 @@ void		chk_fd_err(int fd);
 int ft_execve(char *argv[], char *envp[]);
 int	ft_access(const char *pathname);
 void run_binary(int argc, char *argv[], t_externs *externs);
-int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_externs *externs);
+int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_shell_info *shell_info);
 int echo(int argc, char *argv[], t_var_lst *env_lst);
 int cd(int argc, char *argv[], t_var_lst *env_lst);
 t_var_lst *init_var_lst(char *envp[]);
