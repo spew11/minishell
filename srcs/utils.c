@@ -124,6 +124,7 @@ int ft_execve(char *argv[], char *envp[]) {
 }
 
 void sig_handler(int signal) {
+	exit_status = 1;
 	if (signal == SIGINT) {
 		printf("\n");
 	}

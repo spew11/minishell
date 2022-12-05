@@ -27,7 +27,7 @@ static void	wait_pids(pid_t *pid_arr, int pipe_num)
 	int	status;
 	int	idx;
 
-	if (pipe_num > 0)
+	if (pipe_num >= 0)
 	{
 		if (waitpid(pid_arr[pipe_num], &status, 0) != pid_arr[pipe_num])
 			exit_status = 1;
@@ -92,24 +92,30 @@ static int	run_cmd(t_cmd_info *cmd_info, t_externs *externs)
 		i++;
 	}
 	int status;
-	if (is_builtin(cmd_info->argv[0])) {
-		ret = exec_builtin(cmd_info->argc, cmd_info->argv, externs->env_lst, externs->export_lst);
+	if (cmd_info->argc == 0) {
+		ret = 0;
 	}
 	else {
-		int pid = fork();
-		if (pid < 0) {
-			ft_putendl_fd(strerror(errno), 2);
-			return (1);
-		}
-		if (pid == 0) {
-			ft_execve(cmd_info->argv, externs->env_arr);
+		if (is_builtin(cmd_info->argv[0])) {
+			ret = exec_builtin(cmd_info->argc, cmd_info->argv, externs->env_lst, externs->export_lst);
 		}
 		else {
-			if (waitpid(pid, &status, 0) != pid) {
+			int pid = fork();
+			if (pid < 0) {
 				ft_putendl_fd(strerror(errno), 2);
 				return (1);
 			}
-			ret = WEXITSTATUS(status);
+			if (pid == 0) {
+				ft_execve(cmd_info->argv, externs->env_arr);
+			}
+			else {
+				if (waitpid(pid, &status, 0) != pid) {
+					ft_putendl_fd(strerror(errno), 2);
+					return (1);
+				}
+				ret = WEXITSTATUS(status);
+				printf("%d\n", ret);
+			}
 		}
 	}
 	close(in_fd);
