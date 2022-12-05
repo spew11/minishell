@@ -19,6 +19,23 @@ int	is_redir(char *str)
 	return (0);
 }
 
+void	init_cmd_info_val(t_cmd_info *cmd_info_arr, int pipe_num)
+{
+	int	i;
+
+	i = 0;
+	while (i < pipe_num + 1)
+	{
+		cmd_info_arr[i].argc = 0;
+		cmd_info_arr[i].argv = NULL;
+		cmd_info_arr[i].redir_num = 0;
+		cmd_info_arr[i].redir = NULL;
+		cmd_info_arr[i].here_num = 0;
+		cmd_info_arr[i].here = NULL;
+		i++;
+	}
+}
+
 int	init_cmd_info(t_cmd_info *cmd_info, int *cnt)
 {
 	int	i;
@@ -52,7 +69,7 @@ int	init_cmd_info(t_cmd_info *cmd_info, int *cnt)
 	return (1);
 }
 
-t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num)
+t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, t_list **here_list)
 {
 	t_cmd_info	*cmd_info_arr;
 	t_list		*cur;
@@ -60,6 +77,7 @@ t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num)
 	int			cnt[3];
 
 	cmd_info_arr = malloc(sizeof(t_cmd_info) * (pipe_num + 1)); //malloc
+	init_cmd_info_val(cmd_info_arr, pipe_num);
 	cnt[ARGC] = 0;
 	cnt[REDIR] = 0;
 	cnt[HERE] = 0;
@@ -68,22 +86,31 @@ t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num)
 	// 파이프 마지막 전까지의 cmd_info를 malloc
 	while (cur) {
 		if (!ft_strncmp(cur -> content, "|", 2)) {
+			if (cur->next && !ft_strncmp(cur->next->content, "|", 2))
+			{
+				token_err(cur->next->content);
+				break;
+			}
 			init_cmd_info(cmd_info_arr + cmd_i, cnt);
 			printf("[argc: %d, redir: %d]\n", cnt[ARGC], cnt[REDIR]);
-			if (!ft_strncmp(cur->next->content, "|", 2))
-				token_err(cur->next->content);
 			cnt[ARGC] = 0;
 			cnt[REDIR] = 0;
 			cnt[HERE] = 0;
 			cmd_i++;
 		}
 		else if (is_redir(cur -> content)) {
+			if (cur->next && (is_redir(cur->next->content) || !ft_strncmp(cur->next->content, "|", 2)))
+			{
+				token_err(cur->next->content);
+				break;
+			}
 			cnt[REDIR] += 1;
-			if (!ft_strncmp(cur -> content, "<<", 3))
+			if (!ft_strncmp(cur -> content, "<<", 3) && cur->next) {
 				cnt[HERE] += 1;
-			cur = cur -> next;
-			if (is_redir(cur -> content) || !ft_strncmp(cur -> content, "|", 2))
-				token_err(cur -> content);
+				ft_lstadd_back(here_list, ft_lstnew(strdup(cur->next->content)));
+			}
+			if (cur->next)
+				cur = cur -> next;
 		}
 		else
 			cnt[ARGC] += 1;
