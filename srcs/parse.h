@@ -39,9 +39,10 @@ enum	e_opt {
 };
 
 t_list *divide_line_into_token(char *line);
-t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, t_list **here_list);
-void	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *token_list, t_var_lst *env_lst);
-void	here_doc(t_cmd_info *cmd_arr, int pipe_num);
+t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, t_list **here_list, int *syntax_err);
+int	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *token_list, t_list *tmp_list, t_var_lst *env_lst);
+t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, t_var_lst *env_lst);
+void	token_err(char *str, int *syntax_err);
 // temp 
 t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst);
 void print(void *ptr);

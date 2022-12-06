@@ -1,9 +1,13 @@
 #include "./parse.h"
 
-void	token_err(char *str)
+void	token_err(char *str, int *syntax_err)
 {
 	//free함수 만들기
-	printf("token syntax error : %s\n", str);
+	if (syntax_err)
+		*syntax_err = 1;
+	ft_putstr_fd("token syntax error : `", 2);
+	ft_putstr_fd(str, 2);
+	ft_putstr_fd("\'\n", 2);
 }
 
 int	is_redir(char *str)
@@ -69,7 +73,7 @@ int	init_cmd_info(t_cmd_info *cmd_info, int *cnt)
 	return (1);
 }
 
-t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, t_list **here_list)
+t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, t_list **here_list, int *syntax_err)
 {
 	t_cmd_info	*cmd_info_arr;
 	t_list		*cur;
@@ -86,11 +90,19 @@ t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, t_list **here_li
 	// 파이프 마지막 전까지의 cmd_info를 malloc
 	while (cur) {
 		if (!ft_strncmp(cur -> content, "|", 2)) {
-			if (cur->next && !ft_strncmp(cur->next->content, "|", 2))
+			// 파이프로 끝난건 나중에
+			if (!cnt[ARGC] && !cnt[REDIR] && !cnt[HERE])
 			{
-				token_err(cur->next->content);
-				break;
+				token_err(cur -> content, syntax_err);
+				free(cur->content);
+				cur->content = NULL;
+				break ;
 			}
+			// if (cur->next && !ft_strncmp(cur->next->content, "|", 2))
+			// {
+			// 	token_err(cur->next->content);
+			// 	break;
+			// }
 			init_cmd_info(cmd_info_arr + cmd_i, cnt);
 			printf("[argc: %d, redir: %d]\n", cnt[ARGC], cnt[REDIR]);
 			cnt[ARGC] = 0;
@@ -101,13 +113,16 @@ t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, t_list **here_li
 		else if (is_redir(cur -> content)) {
 			if (cur->next && (is_redir(cur->next->content) || !ft_strncmp(cur->next->content, "|", 2)))
 			{
-				token_err(cur->next->content);
+				token_err(cur->next->content, syntax_err);
+				free(cur->content);
+				cur->content = NULL;
 				break;
 			}
 			cnt[REDIR] += 1;
 			if (!ft_strncmp(cur -> content, "<<", 3) && cur->next) {
 				cnt[HERE] += 1;
-				ft_lstadd_back(here_list, ft_lstnew(strdup(cur->next->content)));
+				ft_lstadd_back(here_list, ft_lstnew(ft_strdup(cur->next->content)));
+				// append delim to here_list
 			}
 			if (cur->next)
 				cur = cur -> next;
