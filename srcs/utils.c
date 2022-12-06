@@ -114,9 +114,13 @@ static char *get_pathname(char *envp[], char *filename) {
 	return (0);
 }
 
-int ft_execve(char *argv[], char *envp[]) {
-	char *pathname = get_pathname(envp, argv[0]);
-	if (execve(pathname, argv, envp) == -1) {
+int ft_execve(char *argv[], t_externs *externs) {
+	if (externs->env_arr) {
+		free_double_arr(externs->env_arr);
+	}
+	externs->env_arr = env_lst2arr(externs->env_lst);
+	char *pathname = get_pathname(externs->env_arr, argv[0]);
+	if (execve(pathname, argv, externs->env_arr) == -1) {
 		ft_putendl_fd(strerror(errno), 2);
 		exit (1);
 	}
@@ -124,15 +128,25 @@ int ft_execve(char *argv[], char *envp[]) {
 }
 
 void sig_handler(int signal) {
-	exit_status = 1;
+	pid_t pid;
+	int	status;
+
+	pid = waitpid(-1, &status, WNOHANG);
 	if (signal == SIGINT) {
-		printf("\n");
+		if (pid == -1) {
+			printf("\n");
+			if (rl_on_new_line() == -1)
+				exit(1);
+			rl_replace_line("", 1);
+			rl_redisplay();
+			exit_status = 1;
+		}
+		else {
+			printf("\n");
+			return ;
+		}
 	}
-	if (rl_on_new_line() == -1) {
-		exit(1);
-	}
-	rl_replace_line("", 1);
-	rl_redisplay();
+	return ;
 }
 
 void signal_on() {

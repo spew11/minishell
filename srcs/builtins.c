@@ -102,6 +102,7 @@ int export(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst) 
 					add_var_lst(env_lst, var_val[0], var_val[1]);
 				}
 				else {
+					ft_putendl_fd("here", 2);
 					ret = 1;
 				}
 				free(var_val);

@@ -18,10 +18,11 @@ int minishell(t_shell_info *shell_info) {
 		else if (line) {
 			add_history(line);
 			cmd_infos = parse_line(line, &pipe_num, shell_info->externs->env_lst);
-			here_doc(cmd_infos, pipe_num);
-			ret = run_cmds(cmd_infos, pipe_num, shell_info);
-			free(line);
-			//free_cmd_infos;
+			if (cmd_infos) {
+				ret = run_cmds(cmd_infos, pipe_num, shell_info);
+				free(line);
+				//free_cmd_infos;
+			}
 		}
 	}
 	return (ret);
@@ -44,7 +45,6 @@ int main(int argc, char *argv[], char *envp[]) {
 	term.c_lflag &= ~(ECHOCTL);
 	tcsetattr(0, TCSANOW, &term);
 	signal_on();
-	
 	exit_status = 0;
 	t_shell_info shell_info;
 	shell_info.externs = (t_externs *)malloc(sizeof(t_externs) * 1);
@@ -54,7 +54,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	}
 	shell_info.externs->env_lst = init_var_lst(envp);
 	shell_info.externs->export_lst = init_var_lst(envp);
-	shell_info.externs->env_arr = env_lst2arr(shell_info.externs->env_lst);
+	shell_info.externs->env_arr = 0;
 	ret = minishell(&shell_info);
 	clear_shell_info(&shell_info);
 	return (ret);

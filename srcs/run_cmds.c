@@ -27,16 +27,21 @@ static void	wait_pids(pid_t *pid_arr, int pipe_num)
 	int	status;
 	int	idx;
 
-	if (pipe_num >= 0)
+	if (pipe_num > 0)
 	{
 		if (waitpid(pid_arr[pipe_num], &status, 0) != pid_arr[pipe_num])
-			exit_status = 1;
-		exit_status = WEXITSTATUS(status);
+			exit_status = -1;
+		if (WIFEXITED(status) != 0) {
+			exit_status = WEXITSTATUS(status);
+		}
+		else if (WIFSIGNALED(status)) {
+			exit_status = WTERMSIG(status) + 128;
+		}
 		idx = 0;
 		while (idx < pipe_num)
 		{
 			if (waitpid(pid_arr[idx], 0, 0) != pid_arr[idx])
-				exit_status = 1;
+				exit_status = -1;
 			idx++;
 		}
 	}
@@ -106,15 +111,19 @@ static int	run_cmd(t_cmd_info *cmd_info, t_externs *externs)
 				return (1);
 			}
 			if (pid == 0) {
-				ft_execve(cmd_info->argv, externs->env_arr);
+				ft_execve(cmd_info->argv, externs);
 			}
 			else {
 				if (waitpid(pid, &status, 0) != pid) {
 					ft_putendl_fd(strerror(errno), 2);
-					return (1);
+					return (-1);
 				}
-				ret = WEXITSTATUS(status);
-				printf("%d\n", ret);
+				if (WIFEXITED(status) != 0) {
+					ret = WEXITSTATUS(status);
+				}
+				else if (WIFSIGNALED(status)) {
+					ret = WTERMSIG(status) + 128;
+				}
 			}
 		}
 	}
@@ -146,6 +155,7 @@ int	run_cmd_with_pipe(t_cmd_info *cmd_infos, int pipe_num, int idx,
 	}
 	if (shell_info->pid_arr[idx] == 0)
 	{
+		signal(SIGINT, SIG_DFL);
 		if (idx < pipe_num)
 		{
 			dup2(shell_info->out_fd[1], 1);
@@ -185,8 +195,9 @@ int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_shell_info *shell_info)
 	{
 		if (idx < pipe_num)
 			pipe(shell_info->out_fd);
-		if (pipe_num == 0)
+		if (pipe_num == 0) {
 			run_cmd_without_pipe(cmd_infos, idx, shell_info->externs);
+		}
 		else
 			if (run_cmd_with_pipe(cmd_infos, pipe_num, idx, shell_info))
 				return (1);

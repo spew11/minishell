@@ -72,7 +72,7 @@ void	signal_on(void);
 void		chk_fork_err(int pid);
 void		chk_fd_err(int fd);
 
-int ft_execve(char *argv[], char *envp[]);
+int ft_execve(char *argv[], t_externs *externs);
 int	ft_access(const char *pathname);
 void run_binary(int argc, char *argv[], t_externs *externs);
 int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_shell_info *shell_info);
