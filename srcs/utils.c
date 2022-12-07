@@ -86,16 +86,19 @@ char **ft_slice(char *str, char sep) {
 	return (strs);
 }
 
-int ft_access(const char *pathname) {
-	struct stat statbuf;
-	if (stat(pathname, &statbuf) == 0) {
+int	ft_access(const char *pathname)
+{
+	struct	stat statbuf;
+
+	if (stat(pathname, &statbuf) == 0)
 		return (0);
-	}
 	return (-1);
 }
 
 static char *get_pathname(char *envp[], char *filename) {
 	char *pathname = 0;
+	if (envp == 0)
+		return (0);
 	if (ft_access(filename) == 0) {
 		return (filename);
 	}
@@ -117,42 +120,48 @@ static char *get_pathname(char *envp[], char *filename) {
 	return (0);
 }
 
-int ft_execve(char *argv[], t_externs *externs) {
-	if (externs->env_arr) {
+int	ft_execve(char *argv[], t_externs *externs)
+{
+	char *pathname;
+
+	if (externs->env_arr)
+	{
 		free_double_arr(externs->env_arr);
 	}
 	externs->env_arr = env_lst2arr(externs->env_lst);
-	char *pathname = get_pathname(externs->env_arr, argv[0]);
-	if (execve(pathname, argv, externs->env_arr) == -1) {
+	pathname = get_pathname(externs->env_arr, argv[0]);
+	if (execve(pathname, argv, externs->env_arr) == -1)
+	{
 		ft_putendl_fd("command not found", 2);
-		exit (1);
+		exit(1);
 	}
 	return (0);
 }
 
-void sig_handler(int signal) {
-	pid_t pid;
-	int	status;
+void	sig_handler(int signal)
+{
+	pid_t	pid;
+	int		status;
 
 	pid = waitpid(-1, &status, WNOHANG);
-	if (signal == SIGINT) {
-		if (pid == -1) {
-			printf("\n");
-			if (rl_on_new_line() == -1)
-				exit(1);
-			rl_replace_line("", 1);
-			rl_redisplay();
-			exit_status = 1;
-		}
-		else {
-			printf("\n");
-			return ;
-		}
+	if (pid == -1)
+	{
+		printf("\n");
+		if (rl_on_new_line() == -1)
+			exit(1);
+		rl_replace_line("", 1);
+		rl_redisplay();
+		exit_status = 1;
+	}
+	else
+	{
+		printf("\n");
 	}
 	return ;
 }
 
-void signal_on() {
+void	signal_on(void)
+{
 	signal(SIGINT, sig_handler);
 	signal(SIGQUIT, SIG_IGN);
 }

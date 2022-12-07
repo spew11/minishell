@@ -177,27 +177,41 @@ void print_var_lst(t_var_lst *var_lst) {
 	}
 	return ;
 }
-t_var_lst *init_var_lst(char *envp[]) {
-	int i = 1;
-	char **var_val;
 
-	if (!envp || !envp[0]) {
-		return 0;
+t_var_lst *init_var_lst(char *envp[])
+{
+	char		**var_val;
+	t_var_lst	*head;
+	int			i;
+
+	if (!envp || !envp[0])
+		return (0);
+	head = (t_var_lst *)malloc(sizeof(t_var_lst) * 1);
+	if (!head)
+	{
+		ft_putendl_fd(strerror(errno), 2);
+		exit(1);
 	}
-	t_var_lst *head = (t_var_lst *)malloc(sizeof(t_var_lst) * 1);
 	var_val = ft_slice(envp[0], '=');
 	head->var = var_val[0];
 	head->val = var_val[1];
-	free(var_val);
 	head->next = 0;
+	free(var_val);
 	t_var_lst *now = head;
-	while (envp[i]) {
+	i = 1;
+	while (envp[i])
+	{
 		now->next = (t_var_lst *)malloc(sizeof(t_var_lst) * 1);
+		if (!(now->next)) {
+			clear_var_lst(head);
+			ft_putendl_fd(strerror(errno), 2);
+			exit (1);
+		}
 		var_val = ft_slice(envp[i], '=');
 		now->next->var = var_val[0];
 		now->next->val = var_val[1];
-		free(var_val);
 		now->next->next = 0;
+		free(var_val);
 		now = now->next;
 		i++;
 	}
