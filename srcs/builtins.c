@@ -35,6 +35,7 @@ int echo(int argc, char *argv[], t_var_lst *env_lst)
 
 int cd(int argc, char *argv[], t_var_lst *env_lst) {
 	char *home_path = ft_getenv(env_lst, "HOME");
+	struct stat statbuf;
 
 	if (argc > 2) {
 		ft_putstr_fd("too many arguments\n", 2);
@@ -51,11 +52,17 @@ int cd(int argc, char *argv[], t_var_lst *env_lst) {
 				chdir(home_path);
 			}
 			else {
-				if (ft_access(paths[i]) < 0) {
+				if (stat(paths[i], &statbuf) != 0) {
 					ft_putendl_fd(strerror(errno), 2);
 					return (1);
 				}
-				chdir(paths[i]);
+				else {
+					if (!S_ISDIR(statbuf.st_mode)) {
+						ft_putendl_fd("not a directory", 2);
+						return (1);
+					}
+					chdir(paths[i]);
+				}
 			}
 			i++;
 		}

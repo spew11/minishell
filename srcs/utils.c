@@ -96,6 +96,9 @@ int ft_access(const char *pathname) {
 
 static char *get_pathname(char *envp[], char *filename) {
 	char *pathname = 0;
+	if (ft_access(filename) == 0) {
+		return (filename);
+	}
 	for (int i = 0; envp[i]; i++) {
 		char *paths = ft_strchr(envp[i], '=') + 1;
 		char **path = ft_split(paths, ':');
@@ -121,7 +124,7 @@ int ft_execve(char *argv[], t_externs *externs) {
 	externs->env_arr = env_lst2arr(externs->env_lst);
 	char *pathname = get_pathname(externs->env_arr, argv[0]);
 	if (execve(pathname, argv, externs->env_arr) == -1) {
-		ft_putendl_fd(strerror(errno), 2);
+		ft_putendl_fd("command not found", 2);
 		exit (1);
 	}
 	return (0);
