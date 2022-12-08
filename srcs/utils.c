@@ -1,8 +1,12 @@
 #include "minishell.h"
 
-void free_double_arr(char **arr) {
-	int i = 0;
-	while (arr[i]) {
+void	free_double_arr(char **arr)
+{
+	int	i;
+
+	i = 0;
+	while (arr[i])
+	{
 		free(arr[i]);
 		i++;
 	}
@@ -10,50 +14,59 @@ void free_double_arr(char **arr) {
 	return ;
 }
 
-int is_builtin(char *cmd) {
+int	is_builtin(char *cmd)
+{
 	if (ft_strncmp(cmd, "echo", -1) == 0)
-		return 1;
+		return (1);
 	if (ft_strncmp(cmd, "cd", -1) == 0)
-		return 1;
+		return (1);
 	if (ft_strncmp(cmd, "pwd", -1) == 0)
-		return 1;
+		return (1);
 	if (ft_strncmp(cmd, "export", -1) == 0)
-		return 1;
+		return (1);
 	if (ft_strncmp(cmd, "unset", -1) == 0)
-		return 1;
+		return (1);
 	if (ft_strncmp(cmd, "env", -1) == 0)
-		return 1;
+		return (1);
 	if (ft_strncmp(cmd, "exit", -1) == 0)
-		return 1;
-	return 0;
+		return (1);
+	return (0);
 }
 
-int exec_builtin(int argc, char *argv[], t_var_lst *env_lst, t_var_lst *export_lst) {
+int	exec_builtin(int argc, char *argv[],
+		t_var_lst *env_lst, t_var_lst *export_lst)
+{
 	if (ft_strncmp(argv[0], "echo", -1) == 0)
-		return echo(argc, argv, env_lst);
+		return (echo(argc, argv, env_lst));
 	if (ft_strncmp(argv[0], "cd", -1) == 0)
-		return cd(argc, argv, env_lst);
+		return (cd(argc, argv, env_lst));
 	if (ft_strncmp(argv[0], "pwd", -1) == 0)
-		return pwd();
+		return (pwd());
 	if (ft_strncmp(argv[0], "export", -1) == 0)
-		return export(argc, argv, &env_lst, &export_lst);
+		return (export(argc, argv, &env_lst, &export_lst));
 	if (ft_strncmp(argv[0], "unset", -1) == 0)
-		return unset(argc, argv, &env_lst, &export_lst);
+		return (unset(argc, argv, &env_lst, &export_lst));
 	if (ft_strncmp(argv[0], "env", -1) == 0)
-		return env(argc, argv, env_lst);
+		return (env(argc, argv, env_lst));
 	if (ft_strncmp(argv[0], "exit", -1) == 0)
-		ft_exit(argc, argv);
-	return 1;
+		(ft_exit(argc, argv));
+	return (1);
 }
 
-int chk_var_name(char *var_name) {
-	int i = 0;
-	while (var_name[i]) {
-		if (i == 0 && ft_isdigit(var_name[i])) {
+int	chk_var_name(char *var_name)
+{
+	int	i;
+
+	i = 0;
+	while (var_name[i])
+	{
+		if (i == 0 && ft_isdigit(var_name[i]))
+		{
 			ft_putendl_fd("not a valid identifier", 2);
 			return (0);
 		}
-		if (!ft_isalnum(var_name[i]) && var_name[i] != '_') {
+		if (!ft_isalnum(var_name[i]) && var_name[i] != '_')
+		{
 			ft_putendl_fd("not a valid identifier", 2);
 			return (0);
 		}
@@ -62,25 +75,48 @@ int chk_var_name(char *var_name) {
 	return (1);
 }
 
-char **ft_slice(char *str, char sep) {
-	char **strs;
-	int i = 0;
-	int sep_idx = 0;
-	size_t str_len = ft_strlen(str);
-	while (str[i]) {
-		if (str[i] == sep) {
-			sep_idx = i;
+void	null_guard_double_arr(char **arr)
+{
+	if (!arr)
+	{
+		ft_putendl_fd(strerror(errno), 2);
+		exit(1);
+	}
+	return ;
+}
+
+void	null_guard_arr(char *arr)
+{
+	if (!arr)
+	{
+		ft_putendl_fd(strerror(errno), 2);
+		exit(1);
+	}
+	return ;
+}
+
+char	**ft_slice(char *str, char sep)
+{
+	char	**strs;
+	int		sep_idx;
+	size_t	str_len;
+
+	str_len = ft_strlen(str);
+	sep_idx = -1;
+	while (str[++sep_idx])
+	{
+		if (str[sep_idx] == sep)
 			break;
-		}
-		i++;
 	}
-	if (i == str_len) {
+	if (sep_idx == str_len)
 		return (0);
-	}
 	strs = (char **)malloc(sizeof(char *) * 3);
+	null_guard_double_arr(strs);
 	strs[2] = 0;
 	strs[0] = (char *)malloc(sizeof(char) * (sep_idx + 1));
+	null_guard_arr(strs[0]);
 	strs[1] = (char *)malloc(sizeof(char) * (str_len - sep_idx));
+	null_guard_arr(strs[1]);
 	ft_strlcpy(strs[0], str, sep_idx + 1);
 	ft_strlcpy(strs[1], str + sep_idx + 1, str_len - sep_idx);
 	return (strs);
@@ -95,29 +131,48 @@ int	ft_access(const char *pathname)
 	return (-1);
 }
 
-static char *get_pathname(char *envp[], char *filename) {
-	char *pathname = 0;
-	if (envp == 0)
-		return (0);
-	if (ft_access(filename) == 0) {
-		return (filename);
-	}
-	for (int i = 0; envp[i]; i++) {
-		char *paths = ft_strchr(envp[i], '=') + 1;
-		char **path = ft_split(paths, ':');
-		for (int j = 0; path[j]; j++) {
-			char *tmp = ft_strjoin(path[j], "/");
-			if (!pathname) {
-				free(pathname);
-			}
-			pathname = ft_strjoin(tmp, filename);
+void	get_pathname_in_env(char *envp[], char *filename, char **pathname)
+{
+	char	*paths;
+	char	**path;
+	char	*tmp;
+	int		i;
+	int		j;
+	
+	i = -1;
+	while (envp[++i])
+	{
+		paths = ft_strchr(envp[i], '=') + 1;
+		path = ft_split(paths, ':');
+		j = -1;
+		while (path[++j])
+		{
+			tmp = ft_strjoin(path[j], "/");
+			if (*pathname)
+				free(*pathname);
+			*pathname = ft_strjoin(tmp, filename);
 			free(tmp);
-			if (ft_access(pathname) == 0) {
-				return (pathname);
-			}
+			if (ft_access(*pathname) == 0)
+				return ;
 		}
 	}
-	return (0);
+	free(*pathname);
+	*pathname = 0;
+	return ;
+}
+
+static char	*get_pathname(char *envp[], char *filename)
+{
+	char	*pathname;
+
+	pathname = 0;
+	if (envp == 0)
+		return (0);
+	if (ft_access(filename) == 0)
+		return (filename);
+
+	get_pathname_in_env(envp, filename, &pathname);
+	return (pathname);
 }
 
 int	ft_execve(char *argv[], t_externs *externs)

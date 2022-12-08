@@ -99,4 +99,6 @@ int exec_builtin(int argc, char *argv[], t_var_lst *env_lst, t_var_lst *export_l
 void clear_externs(t_externs *externs);
 void clear_var_lst(t_var_lst *var_lst);
 void free_double_arr(char **arr);
+void null_guard_arr(char *arr);
+void null_guard_double_arr(char **arr);
 #endif

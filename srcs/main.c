@@ -73,7 +73,7 @@ int	main(int argc, char *argv[], char *envp[])
 	t_shell_info	shell_info;
 	int				ret;
 
-	if (argc > 2)
+	if (argc > 1)
 	{
 		ft_putendl_fd("too many arguments", 2);
 		return (1);
