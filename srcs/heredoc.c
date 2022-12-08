@@ -18,7 +18,6 @@ t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, t_var_lst
 	char	*delim;
 	char	*tmp_file;
 	int		tmp_fd;
-	int		quote_flag;
 	t_list	*tmp_list;
 	t_list	*cur;
 
@@ -28,8 +27,7 @@ t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, t_var_lst
 	while (cur)
 	{
 		// replace quote
-		delim = (cur->content);
-		quote_flag = (ft_strchr(delim, '\'') || ft_strchr(delim, '\"'));
+		delim = cur->content;
 		tmp_file = get_tmp_name(); // malloc
 		tmp_fd = open(tmp_file, O_WRONLY | O_CREAT, 00644);
 		printf("--------------\n");

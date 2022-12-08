@@ -83,7 +83,7 @@ t_list	*split_by_space(char *line)
 	return (spl_list);
 }
 
-int	append_buff_to_list(char *buff, int *buf_i, t_list **token_list)
+int	append_buff_to_list(char *buff, int *buf_i, t_list **list)
 {
 	char	*str;
 	t_list	*new;
@@ -92,19 +92,19 @@ int	append_buff_to_list(char *buff, int *buf_i, t_list **token_list)
 	str = ft_strdup(buff);
 	if (!str)
 	{
-		ft_lstclear(token_list, ft_free);
+		ft_lstclear(list, ft_free);
 		free(buff);
 		return (0);
 	}
 	new = ft_lstnew(str);
 	if (!new)
 	{
-		ft_lstclear(token_list, ft_free);
+		ft_lstclear(list, ft_free);
 		free(str);
 		free(buff);
 		return (0);
 	}
-	ft_lstadd_back(token_list, new);
+	ft_lstadd_back(list, new);
 	ft_bzero(buff, ft_strlen(buff) + 1);
 	*buf_i = 0;
 	return (1);

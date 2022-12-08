@@ -16,6 +16,25 @@ static int count_pipe(t_list *token_list)
 	return (pipe_num);
 }
 
+void	cmd_info_free(t_cmd_info **cmd_info_arr, int pipe_num)
+{
+	int	i;
+
+	i = 0;
+	while (i < pipe_num + 1)
+	{
+		if ((*cmd_info_arr)[i].argv)
+			free((*cmd_info_arr)[i].argv);
+		if ((*cmd_info_arr)[i].redir)
+			free((*cmd_info_arr)[i].redir);
+		if ((*cmd_info_arr)[i].here)
+			free((*cmd_info_arr)[i].here);
+		i++;
+	}
+	free(*cmd_info_arr);
+	*cmd_info_arr = NULL;
+}
+
 t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst)
 {
 	t_cmd_info	*cmd_info_arr;
@@ -36,7 +55,10 @@ t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst)
 	syntax_err = 0;
 	cmd_info_arr = init_cmd_info_arr(token_list, *pipe_num, &here_list, &syntax_err); // malloc
 	if (!cmd_info_arr)
+	{
+		ft_putendl_fd("malloc_err", 2);
 		return (NULL);//token_list free함수 만들기
+	}
 	printf("here: ");ft_lstiter(here_list, print);printf("\n");
 
 	tmp_list = here_doc(cmd_info_arr, *pipe_num, here_list, env_lst);

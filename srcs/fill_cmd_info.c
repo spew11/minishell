@@ -62,15 +62,17 @@ char	*connect_list(t_list *list)
 
 char	*replace_symbol_to_text(char *str, t_var_lst *env_lst)
 {
-	t_list	*text_list = NULL;
+	t_list	*text_list;
 	char	*text;
 	char	*buff;
 	int		str_i = 0;
 	int		buf_i = 0;
 	int		quote_flag = 0;
 
+	
 	buff = malloc(sizeof(char) * (ft_strlen(str) + 1));
 	ft_bzero(buff, (ft_strlen(str) + 1));
+	text_list = NULL;
 	while (str[str_i])
 	{
 		if (!quote_flag && (str[str_i] == '\'' || str[str_i] == '\"'))
