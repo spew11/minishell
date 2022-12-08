@@ -95,7 +95,7 @@ char **env_lst2arr(t_var_lst *env_lst);
 void ft_exit(int argc, char *argv[]);
 t_var_lst*copy_lst(t_var_lst *var_lst);
 int is_builtin(char *cmd);
-int exec_builtin(int argc, char *argv[], t_var_lst *env_lst, t_var_lst *export_lst);
+int exec_builtin(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst);
 void clear_externs(t_externs *externs);
 void clear_var_lst(t_var_lst *var_lst);
 void free_double_arr(char **arr);

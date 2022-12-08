@@ -64,6 +64,7 @@ void	init_shell_info(t_shell_info *shell_info, char *envp[])
 	}
 	shell_info->externs->env_lst = init_var_lst(envp);
 	shell_info->externs->export_lst = init_var_lst(envp);
+	sort_var_lst(shell_info->externs->export_lst);
 	shell_info->externs->env_arr = 0;
 	return ;
 }

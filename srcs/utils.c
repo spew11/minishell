@@ -34,20 +34,20 @@ int	is_builtin(char *cmd)
 }
 
 int	exec_builtin(int argc, char *argv[],
-		t_var_lst *env_lst, t_var_lst *export_lst)
+		t_var_lst **env_lst, t_var_lst **export_lst)
 {
 	if (ft_strncmp(argv[0], "echo", -1) == 0)
-		return (echo(argc, argv, env_lst));
+		return (echo(argc, argv, *env_lst));
 	if (ft_strncmp(argv[0], "cd", -1) == 0)
-		return (cd(argc, argv, env_lst));
+		return (cd(argc, argv, *env_lst));
 	if (ft_strncmp(argv[0], "pwd", -1) == 0)
 		return (pwd());
 	if (ft_strncmp(argv[0], "export", -1) == 0)
-		return (export(argc, argv, &env_lst, &export_lst));
+		return (export(argc, argv, env_lst, export_lst));
 	if (ft_strncmp(argv[0], "unset", -1) == 0)
-		return (unset(argc, argv, &env_lst, &export_lst));
+		return (unset(argc, argv, env_lst, export_lst));
 	if (ft_strncmp(argv[0], "env", -1) == 0)
-		return (env(argc, argv, env_lst));
+		return (env(argc, argv, *env_lst));
 	if (ft_strncmp(argv[0], "exit", -1) == 0)
 		(ft_exit(argc, argv));
 	return (1);
@@ -63,16 +63,16 @@ int	chk_var_name(char *var_name)
 		if (i == 0 && ft_isdigit(var_name[i]))
 		{
 			ft_putendl_fd("not a valid identifier", 2);
-			return (0);
+			return (1);
 		}
 		if (!ft_isalnum(var_name[i]) && var_name[i] != '_')
 		{
 			ft_putendl_fd("not a valid identifier", 2);
-			return (0);
+			return (1);
 		}
 		i++;
 	}
-	return (1);
+	return (0);
 }
 
 void	null_guard_double_arr(char **arr)
@@ -106,7 +106,7 @@ char	**ft_slice(char *str, char sep)
 	while (str[++sep_idx])
 	{
 		if (str[sep_idx] == sep)
-			break;
+			break ;
 	}
 	if (sep_idx == str_len)
 		return (0);
@@ -124,7 +124,7 @@ char	**ft_slice(char *str, char sep)
 
 int	ft_access(const char *pathname)
 {
-	struct	stat statbuf;
+	struct stat	statbuf;
 
 	if (stat(pathname, &statbuf) == 0)
 		return (0);
@@ -138,7 +138,7 @@ void	get_pathname_in_env(char *envp[], char *filename, char **pathname)
 	char	*tmp;
 	int		i;
 	int		j;
-	
+
 	i = -1;
 	while (envp[++i])
 	{
@@ -158,7 +158,6 @@ void	get_pathname_in_env(char *envp[], char *filename, char **pathname)
 	}
 	free(*pathname);
 	*pathname = 0;
-	return ;
 }
 
 static char	*get_pathname(char *envp[], char *filename)
@@ -170,14 +169,13 @@ static char	*get_pathname(char *envp[], char *filename)
 		return (0);
 	if (ft_access(filename) == 0)
 		return (filename);
-
 	get_pathname_in_env(envp, filename, &pathname);
 	return (pathname);
 }
 
 int	ft_execve(char *argv[], t_externs *externs)
 {
-	char *pathname;
+	char	*pathname;
 
 	if (externs->env_arr)
 	{

@@ -102,7 +102,7 @@ static int	run_cmd(t_cmd_info *cmd_info, t_externs *externs)
 	}
 	else {
 		if (is_builtin(cmd_info->argv[0])) {
-			ret = exec_builtin(cmd_info->argc, cmd_info->argv, externs->env_lst, externs->export_lst);
+			ret = exec_builtin(cmd_info->argc, cmd_info->argv, &externs->env_lst, &externs->export_lst);
 		}
 		else {
 			int pid = fork();
