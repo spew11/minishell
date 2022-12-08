@@ -6,7 +6,7 @@
 #    By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/05 21:09:19 by eunjilee          #+#    #+#              #
-#    Updated: 2022/12/05 16:23:22 by eunjilee         ###   ########.fr        #
+#    Updated: 2022/12/08 16:41:55 by eunjilee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,7 +30,7 @@ MINISHELL = main.c \
 			parse_line.c \
 			w_utils.c \
 			run_cmds.c \
-			div_line.c\
+			divide_line.c\
 			fill_cmd_info.c\
 			init_cmd_info.c\
 			heredoc.c

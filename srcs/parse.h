@@ -50,7 +50,7 @@ void	print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num);
 t_var_lst *init_var_lst(char *envp[]);
 char *find_env(t_var_lst *env_lst, char *str);
 int	is_redir(char *str);
-void	append_buff_to_list(char *buff, int *buf_i, t_list **list);
+int	append_buff_to_list(char *buff, int *buf_i, t_list **list);
 
 /*
 

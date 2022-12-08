@@ -28,6 +28,7 @@ int	minishell(t_shell_info *shell_info)
 		cmd_infos = parse_line(line, &pipe_num,
 				shell_info->externs->env_lst);
 		free(line);
+
 		if (cmd_infos)
 		{
 			ret = run_cmds(cmd_infos, pipe_num, shell_info);
