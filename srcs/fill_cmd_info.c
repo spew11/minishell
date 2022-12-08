@@ -98,34 +98,66 @@ char	*replace_symbol_to_text(char *str, t_var_lst *env_lst)
 	return (text);
 }
 
-void	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *token_list, t_var_lst *env_lst)
+int	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *token_list, t_list *tmp_list, t_var_lst *env_lst)
 {
-	t_list	*cur;
+	t_list	*cur_token;
+	t_list	*cur_tmp;
 	int		cmd_i;
 	int		av_i;
 	int		re_i;
+	int		here_i;
 
-	cur = token_list;
+	cur_token = token_list;
+	cur_tmp = tmp_list;
 	av_i = 0;
 	re_i = 0;
 	cmd_i = 0;
+	here_i = 0;
 	// 파이프 마지막 전까지의 cmd_info
-	while (cur) {
-		if (!ft_strncmp(cur -> content, "|", 2)) {
+	while (cur_token)
+	{
+		if (!ft_strncmp(cur_token -> content, "|", 2))
+		{
+			if (!cur_token->next)
+			{
+				token_err("newline", NULL);
+				return (1);
+			}
 			av_i = 0;
 			re_i = 0;
-			cmd_i++;
+			here_i = 0;
+			cmd_i += 1;
 		}
-		else if (is_redir(cur -> content)) {
-			cmd_info_arr[cmd_i].redir[re_i].type = get_type(cur->content);
-			cur = cur -> next;
-			cmd_info_arr[cmd_i].redir[re_i].str = replace_symbol_to_text(cur->content, env_lst);
-			re_i += 1;
+		else if (is_redir(cur_token -> content))
+		{
+			cmd_info_arr[cmd_i].redir[re_i].type = get_type(cur_token->content);
+			if (cur_token->next)
+			{
+				cur_token = cur_token -> next;
+				if (cmd_info_arr[cmd_i].redir[re_i].type == HERE_DOC)
+				{
+					cmd_info_arr[cmd_i].redir[re_i].type = INFILE;
+					cmd_info_arr[cmd_i].redir[re_i].str = ft_strdup(cur_tmp->content);
+					cmd_info_arr[cmd_i].here[here_i] = ft_strdup(cur_tmp->content);
+					cur_tmp = cur_tmp->next;
+					here_i += 1;
+				}
+				else
+					cmd_info_arr[cmd_i].redir[re_i].str = replace_symbol_to_text(cur_token->content, env_lst);
+				re_i += 1;
+			}
+			else
+			{
+				token_err("newline", NULL);
+				return (1);
+			}
 		}
-		else {
-			cmd_info_arr[cmd_i].argv[av_i] = replace_symbol_to_text(cur->content, env_lst);
+		else
+		{
+			cmd_info_arr[cmd_i].argv[av_i] = replace_symbol_to_text(cur_token->content, env_lst);
 			av_i += 1;
 		}
-		cur = cur -> next;
+		cur_token = cur_token -> next;
 	}
+	return (0);
 }
