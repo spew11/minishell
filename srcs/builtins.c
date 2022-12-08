@@ -28,9 +28,8 @@ int	echo(int argc, char *argv[], t_var_lst *env_lst)
 	{
 		str = argv[i];
 		printf("%s", str);
-		if (i < argc - 1) {
+		if (i < argc - 1)
 			printf(" ");
-		}
 		i++;
 	}
 	if (!opt_f)
@@ -148,7 +147,7 @@ int	export_add_var(char *argv[], int i, t_var_lst **env_lst,
 		else
 			ret = 1;
 	}
-	return ret;
+	return (ret);
 }
 
 int	export(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst)
@@ -161,10 +160,11 @@ int	export(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst)
 		print_var_lst(*export_lst);
 	else
 	{
-		i = -1;
-		while (argv[++i])
+		i = 1;
+		while (argv[i])
 		{
 			ret = export_add_var(argv, i, env_lst, export_lst);
+			i++;
 		}
 	}
 	return (ret);

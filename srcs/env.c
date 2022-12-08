@@ -1,7 +1,9 @@
 #include "minishell.h"
 
-void clear_var_lst(t_var_lst *var_lst) {
-	while (var_lst) {
+void	clear_var_lst(t_var_lst *var_lst)
+{
+	while (var_lst)
+	{
 		t_var_lst *tmp = var_lst;
 		var_lst = var_lst->next;
 		free(tmp->var);
@@ -11,119 +13,150 @@ void clear_var_lst(t_var_lst *var_lst) {
 	return ;
 }
 
-char **env_lst2arr(t_var_lst *env_lst) {
-	char **envp = 0;
-	if (!env_lst) {
-		return envp;
-	}
-	int cnt = 0;
-	t_var_lst *now = env_lst;
-	while (now) {
-		now = now->next;
+int	get_cnt_lst(t_var_lst *var_lst)
+{
+	int	cnt;
+
+	cnt = 0;
+	while (var_lst)
+	{
+		var_lst = var_lst->next;
 		cnt++;
 	}
-	envp = (char **)malloc(sizeof(char *) * (cnt + 1));
-	now = env_lst;
-
-	int i = 0;
-	while (now) {
-		if (now->val) {
-			char *tmp = ft_strjoin(now->var, "=");
-			envp[i] = ft_strjoin(tmp, now->val);
-			free(tmp);
-		}
-		else {
-			envp[i] = now->var;
-		}
-		i++;
-		now = now->next;
-	}
-	envp[i] = 0;
-	return envp;
+	return (cnt);
 }
 
-int find_var_in_lst(t_var_lst *var_lst, char *var) {
-	t_var_lst *now;
+char	**env_lst2arr(t_var_lst *env_lst)
+{
+	char	**env_arr;
+	char	*tmp;
+	int		i;
 
-	now = var_lst;
-	while (now) {
-		if (ft_strncmp(now->var, var, -1) == 0) {
+	if (!env_lst)
+		return 0;
+	env_arr = (char **)malloc(sizeof(char *) * (get_cnt_lst(env_lst) + 1));
+	null_guard_double_arr(env_arr);
+	i = 0;
+	while (env_lst)
+	{
+		if (env_lst->val)
+		{
+			tmp = ft_strjoin(env_lst->var, "=");
+			env_arr[i] = ft_strjoin(tmp, env_lst->val);
+			free(tmp);
+		}
+		else
+			env_arr[i] = env_lst->var;
+		i++;
+		env_lst = env_lst->next;
+	}
+	env_arr[i] = 0;
+	return (env_arr);
+}
+
+int	find_var_in_lst(t_var_lst *var_lst, char *var)
+{
+	while (var_lst)
+	{
+		if (ft_strncmp(var_lst->var, var, -1) == 0)
+		{
 			return (1);
 		}
-		now = now->next;
+		var_lst = var_lst->next;
 	}
 	return (0);
 }
 
-char *ft_getenv(t_var_lst *env, char *var) {
-	char *val;
-	t_var_lst *now;
-
-	now = env;
-	while (now) {
-		if (ft_strncmp(now->var, var, -1) == 0) {
-			return now->val;
+char	*ft_getenv(t_var_lst *env, char *var)
+{
+	while (env)
+	{
+		if (ft_strncmp(env->var, var, -1) == 0)
+		{
+			return env->val;
 		}
-		now = now->next;
+		env = env->next;
 	}
-	return 0;
+	return (0);
 }
-int remove_var_lst(t_var_lst **var_lst, char *var) {
-	t_var_lst *now;
-	t_var_lst *prev = 0;
-	
-	if (*var_lst == 0) {
-		return 0;
-	}
+
+void	remove_mid_lst(t_var_lst **var_lst, char *var)
+{
+	t_var_lst	*prev;
+	t_var_lst	*now;
+
 	now = *var_lst;
-	if (ft_strncmp(now->var, var, -1) == 0) {
-		(*var_lst) = (*var_lst)->next;
-		free(now->var);
-		free(now->val);
-		free(now);
-		return (0);
-	}
-	while (now) {
-		if (ft_strncmp(now->var, var, -1) == 0) {
+	while (now)
+	{
+		if (ft_strncmp(now->var, var, -1) == 0)
+		{
 			prev->next = now->next;
 			free(now->var);
 			free(now->val);
 			free(now);
-			return (0);
+			return ;
 		}
 		prev = now;
 		now = now->next;
 	}
-	return (0);
+	return ;
 }
 
-void add_var_lst(t_var_lst **var_lst, char *var, char *val) {
+void	remove_var_lst(t_var_lst **var_lst, char *var)
+{
+	t_var_lst	*prev;
 	
-	t_var_lst *now;
+	if (!(*var_lst))
+		return ;
+	prev = *var_lst;
+	if (ft_strncmp(prev->var, var, -1) == 0)
+	{
+		(*var_lst) = (*var_lst)->next;
+		free(prev->var);
+		free(prev->val);
+		free(prev);
+		return ;
+	}
+	remove_mid_lst(var_lst, var);
+	return ;
+}
 
-	if (*var_lst) {
-		now = *var_lst;
-		while (now->next) {
-			if (ft_strncmp(now->var, var, -1) == 0) {
-				if (val) {
-					now->val = val;
-				}
-				return ;
-			}
-			now = now->next;
-		}
-		if (ft_strncmp(now->var, var, -1) == 0) {
-			if (val) {
+void	add_var_lst_1(t_var_lst **var_lst, char *var, char *val, t_var_lst *now)
+{
+	now = *var_lst;
+	while (now->next)
+	{
+		if (ft_strncmp(now->var, var, -1) == 0)
+		{
+			if (val)
 				now->val = val;
-			}
 			return ;
 		}
-		now->next = (t_var_lst *)malloc(sizeof(t_var_lst) * 1);
-		now->next->var = var;
-		now->next->val = val;
-		now->next->next = 0;
+		now = now->next;
 	}
-	else {
+	if (ft_strncmp(now->var, var, -1) == 0)
+	{
+		if (val)
+			now->val = val;
+		return ;
+	}
+	now->next = (t_var_lst *)malloc(sizeof(t_var_lst) * 1);
+	now->next->var = var;
+	now->next->val = val;
+	now->next->next = 0;
+	return ;
+}
+
+void	add_var_lst(t_var_lst **var_lst, char *var, char *val)
+{
+	t_var_lst	*now;
+
+	if (*var_lst)
+	{
+		add_var_lst_1(var_lst, var, val, now);
+	}
+	else
+	{
 		*var_lst = (t_var_lst *)malloc(sizeof(t_var_lst) * 1);
 		(*var_lst)->next->var = var;
 		(*var_lst)->next->val = val;
@@ -132,7 +165,8 @@ void add_var_lst(t_var_lst **var_lst, char *var, char *val) {
 	return ;
 }
 
-void sort_var_lst(t_var_lst *var_lst) {
+void	sort_var_lst(t_var_lst *var_lst)
+{
 	t_var_lst *seat;
 	t_var_lst *ptr;
 	t_var_lst *min;

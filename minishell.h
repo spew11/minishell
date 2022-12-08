@@ -86,7 +86,7 @@ void sort_var_lst(t_var_lst *var_lst);
 void add_var_lst(t_var_lst **var_lst, char *var, char *val);
 char *ft_getenv(t_var_lst *env_lst, char *var);
 int env(int argc, char *argv[], t_var_lst *env_lst);
-int remove_var_lst(t_var_lst **var_lst, char *var);
+void remove_var_lst(t_var_lst **var_lst, char *var);
 int pwd(void);
 int unset(int argc, char *argv[], t_var_lst **export_lst, t_var_lst **env_lst);
 int chk_var_name(char *var_name);
