@@ -101,23 +101,20 @@ int	pwd(void)
 
 static char	**get_var_val(char *str)
 {
-	char	**strs;
-	char	*var;
-	char	*val;
+	char	**var_val;
 
-	strs = ft_slice(str, '=');
-	var = strs[0];
-	val = strs[1];
-	if (var[0] == 0)
+	var_val = ft_slice(str, '=');
+	if (var_val[0][0] == 0)
 	{
 		ft_putendl_fd("not a valid identifier", 2);
 		return (0);
 	}
-	if (val[0] == '\0')
+	if (var_val[1][0] == '\0')
 	{
-		strs[1] = "\"\"";
+		free(var_val[1]);
+		var_val[1] = ft_strdup("\"\"");
 	}
-	return (strs);
+	return (var_val);
 }
 
 int	export_add_var(char *argv[], int i, t_var_lst **env_lst,
@@ -133,7 +130,6 @@ int	export_add_var(char *argv[], int i, t_var_lst **env_lst,
 		if (var_val && !chk_var_name(var_val[0]))
 		{
 			add_var_lst(export_lst, var_val[0], var_val[1]);
-			sort_var_lst(*export_lst);
 			add_var_lst(env_lst, var_val[0], var_val[1]);
 		}
 		else
@@ -164,6 +160,7 @@ int	export(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst)
 		while (argv[i])
 		{
 			ret = export_add_var(argv, i, env_lst, export_lst);
+			sort_var_lst(*export_lst);
 			i++;
 		}
 	}

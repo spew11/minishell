@@ -31,12 +31,10 @@ static void	wait_pids(pid_t *pid_arr, int pipe_num)
 	{
 		if (waitpid(pid_arr[pipe_num], &status, 0) != pid_arr[pipe_num])
 			exit_status = -1;
-		if (WIFEXITED(status) != 0) {
+		if (WIFEXITED(status) != 0)
 			exit_status = WEXITSTATUS(status);
-		}
-		else if (WIFSIGNALED(status)) {
+		else if (WIFSIGNALED(status))
 			exit_status = WTERMSIG(status) + 128;
-		}
 		idx = 0;
 		while (idx < pipe_num)
 		{
@@ -48,83 +46,126 @@ static void	wait_pids(pid_t *pid_arr, int pipe_num)
 	return ;
 }
 
-static int	run_cmd(t_cmd_info *cmd_info, t_externs *externs)
+static int	set_input(int *in_fd, int type, char *filename)
 {
-	int in_fd = -1;
-	int out_fd = -1;
-	int type = 0;
-	char *filename;
-	int ret = 0;
+	if (ft_access(filename) == -1)
+	{
+		ft_putendl_fd(strerror(errno), 2);
+		return (1);
+	}
+	if (*in_fd != -1)
+		close(*in_fd);
+	*in_fd = open(filename, O_RDONLY, 0644);
+	if (*in_fd < 0)
+	{
+		ft_putendl_fd("Failed to open file", 2);
+		return (1);
+	}
+	dup2(*in_fd, 0);
+	return (0);
+}
 
-	int i = 0;
-	while (i < cmd_info->redir_num) {
+static int	set_output(int *out_fd, int type, char *filename)
+{
+	if (type == OUTFILE)
+	{
+		if (*out_fd != -1)
+			close(*out_fd);
+		*out_fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+	}
+	else if (type == FILE_APPEND)
+	{
+		if (*out_fd != -1)
+			close(*out_fd);
+		*out_fd = open(filename, O_WRONLY | O_TRUNC | O_APPEND | O_CREAT, 0644);
+	}
+	if (*out_fd < 0) 
+	{
+		ft_putendl_fd("Failed to open file", 2);
+		return (1);
+	}
+	dup2(*out_fd, 1);
+	return (0);
+}
+
+static int	set_io(t_cmd_info *cmd_info, int *in_fd, int *out_fd)
+{
+	int		type;
+	char	*filename;
+	int		i;
+
+	*in_fd = -1;
+	*out_fd = -1;
+	i = 0;
+	while (i < cmd_info->redir_num)
+	{
 		type = cmd_info->redir[i].type;
 		filename = cmd_info->redir[i].str;
-		if (type == INFILE || type == HERE_DOC) {
-			if (ft_access(filename) == -1) {
-				ft_putendl_fd(strerror(errno), 2);
+		if (type == INFILE || type == HERE_DOC)
+		{
+			if (set_input(in_fd, type, filename))
 				return (1);
-			}
-			if (in_fd != -1) {
-				close(in_fd);
-			}
-			in_fd = open(filename, O_RDONLY, 0644);
-			if (in_fd < 0) {
-				ft_putendl_fd("Failed to open file", 2);
-				return (1);
-			}
-			dup2(in_fd, 0);
 		}
-		else {
-			if (type == OUTFILE) {
-				if (out_fd != -1) {
-					close(out_fd);
-				}
-				out_fd = open(filename, O_WRONLY | O_TRUNC | O_CREAT, 0644);
-			}
-			else if (type == FILE_APPEND) {
-				if (out_fd != -1) {
-					close(out_fd);
-				}
-				out_fd = open(filename, O_WRONLY | O_TRUNC | O_APPEND | O_CREAT, 0644);
-			}
-			if (out_fd < 0) {
-				ft_putendl_fd("Failed to open file", 2);
+		else
+		{
+			if (set_output(out_fd, type, filename))
 				return (1);
-			}
-			dup2(out_fd, 1);
 		}
 		i++;
 	}
-	int status;
-	if (cmd_info->argc == 0) {
-		ret = 0;
+	return (0);
+}
+
+static int	exec_binary(t_cmd_info *cmd_info, t_externs *externs)
+{
+	int	pid;
+	int	status;
+	int	ret;
+
+	ret = 0;
+	pid = fork();
+	if (pid < 0)
+	{
+		ft_putendl_fd(strerror(errno), 2);
+		return (1);
 	}
-	else {
-		if (is_builtin(cmd_info->argv[0])) {
-			ret = exec_builtin(cmd_info->argc, cmd_info->argv, &externs->env_lst, &externs->export_lst);
+	if (pid == 0)
+		ft_execve(cmd_info->argv, externs);
+	else
+	{
+		if (waitpid(pid, &status, 0) != pid)
+		{
+			ft_putendl_fd(strerror(errno), 2);
+			return (-1);
 		}
-		else {
-			int pid = fork();
-			if (pid < 0) {
-				ft_putendl_fd(strerror(errno), 2);
-				return (1);
-			}
-			if (pid == 0) {
-				ft_execve(cmd_info->argv, externs);
-			}
-			else {
-				if (waitpid(pid, &status, 0) != pid) {
-					ft_putendl_fd(strerror(errno), 2);
-					return (-1);
-				}
-				if (WIFEXITED(status) != 0) {
-					ret = WEXITSTATUS(status);
-				}
-				else if (WIFSIGNALED(status)) {
-					ret = WTERMSIG(status) + 128;
-				}
-			}
+		if (WIFEXITED(status) != 0)
+			ret = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+			ret = WTERMSIG(status) + 128;
+	}
+	return (ret);
+}
+
+static int	run_cmd(t_cmd_info *cmd_info, t_externs *externs)
+{
+	int	in_fd;
+	int	out_fd;
+	int	ret;
+
+	if (set_io(cmd_info, &in_fd, &out_fd))
+		return (1);
+	if (cmd_info->argc == 0)
+		ret = 0;
+	else
+	{
+		if (is_builtin(cmd_info->argv[0]))
+		{
+			ret = exec_builtin(cmd_info->argc, cmd_info->argv,
+					&externs->env_lst, &externs->export_lst);
+		}
+		else
+		{
+			ret = exec_binary(cmd_info, externs);
 		}
 	}
 	close(in_fd);
@@ -141,6 +182,20 @@ void	run_cmd_without_pipe(t_cmd_info *cmd_infos, int idx, t_externs *externs)
 	exit_status = run_cmd(cmd_infos + idx, externs);
 	dup2(temp[0], 0);
 	dup2(temp[1], 1);
+	return ;
+}
+
+void	close_fds(int pipe_num, int idx, t_shell_info *shell_info)
+{
+	if (idx > 0)
+	{
+		close(shell_info->in_fd);
+	}
+	if (idx < pipe_num)
+	{
+		shell_info->in_fd = shell_info->out_fd[0];
+		close(shell_info->out_fd[1]);
+	}
 	return ;
 }
 
@@ -161,21 +216,15 @@ int	run_cmd_with_pipe(t_cmd_info *cmd_infos, int pipe_num, int idx,
 			dup2(shell_info->out_fd[1], 1);
 			close(shell_info->out_fd[0]);
 		}
-		if (shell_info->in_fd != -1) {
+		if (shell_info->in_fd != -1)
+		{
 			dup2(shell_info->in_fd, 0);
 			close(shell_info->in_fd);
 		}
 		exit(run_cmd(cmd_infos + idx, shell_info->externs));
 	}
-	else {
-		if (idx > 0) {
-			close(shell_info->in_fd);
-		}
-		if (idx < pipe_num) {
-			shell_info->in_fd = shell_info->out_fd[0];
-			close(shell_info->out_fd[1]);
-		}
-	}
+	else
+		close_fds(pipe_num, idx, shell_info);
 	return (0);
 }
 
@@ -195,9 +244,8 @@ int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_shell_info *shell_info)
 	{
 		if (idx < pipe_num)
 			pipe(shell_info->out_fd);
-		if (pipe_num == 0) {
+		if (pipe_num == 0)
 			run_cmd_without_pipe(cmd_infos, idx, shell_info->externs);
-		}
 		else
 			if (run_cmd_with_pipe(cmd_infos, pipe_num, idx, shell_info))
 				return (1);
