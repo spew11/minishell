@@ -92,7 +92,8 @@ void	remove_mid_lst(t_var_lst **var_lst, char *var)
 		{
 			prev->next = now->next;
 			free(now->var);
-			free(now->val);
+			if (now->val)
+				free(now->val);
 			free(now);
 			return ;
 		}
@@ -113,7 +114,8 @@ void	remove_var_lst(t_var_lst **var_lst, char *var)
 	{
 		(*var_lst) = (*var_lst)->next;
 		free(prev->var);
-		free(prev->val);
+		if (prev->val)
+			free(prev->val);
 		free(prev);
 		return ;
 	}

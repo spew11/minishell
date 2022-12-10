@@ -99,51 +99,33 @@ int	pwd(void)
 	return (0);
 }
 
-static char	**get_var_val(char *str)
+static int	export_add_var(char *s, t_var_lst **env_lst, t_var_lst **export_lst)
 {
 	char	**var_val;
 
-	var_val = ft_slice(str, '=');
-	if (var_val[0][0] == 0)
+	var_val = ft_slice(s, '=');
+	if (var_val)
 	{
-		ft_putendl_fd("not a valid identifier", 2);
-		return (0);
-	}
-	if (var_val[1][0] == '\0')
-	{
-		free(var_val[1]);
-		var_val[1] = ft_strdup("\"\"");
-	}
-	return (var_val);
-}
-
-int	export_add_var(char *argv[], int i, t_var_lst **env_lst,
-		t_var_lst **export_lst)
-{
-	char	**var_val;
-	int		ret;
-
-	ret = 0;
-	if (ft_strchr(argv[i], '='))
-	{
-		var_val = get_var_val(argv[i]);
-		if (var_val && !chk_var_name(var_val[0]))
+		if (!var_val[0] || (var_val[0] && chk_var_name(var_val[0])))
+		{
+			ft_putendl_fd("not a valid identifier", 2);
+			return (1);
+		}
+		if (var_val[1] == 0)
+			var_val[1] = ft_strdup("\"\"");
+		if (!chk_var_name(var_val[0]))
 		{
 			add_var_lst(export_lst, var_val[0], var_val[1]);
 			add_var_lst(env_lst, var_val[0], var_val[1]);
 		}
-		else
-			ret = 1;
 		free(var_val);
+		return (0);
 	}
+	if (!chk_var_name(s))
+		add_var_lst(export_lst, s, 0);
 	else
-	{
-		if (!chk_var_name(argv[i]))
-			add_var_lst(export_lst, argv[i], 0);
-		else
-			ret = 1;
-	}
-	return (ret);
+		return (1);
+	return (0);
 }
 
 int	export(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst)
@@ -159,7 +141,7 @@ int	export(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst)
 		i = 1;
 		while (argv[i])
 		{
-			ret = export_add_var(argv, i, env_lst, export_lst);
+			ret = export_add_var(argv[i], env_lst, export_lst);
 			sort_var_lst(*export_lst);
 			i++;
 		}

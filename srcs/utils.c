@@ -102,23 +102,25 @@ char	**ft_slice(char *str, char sep)
 	size_t	str_len;
 
 	str_len = ft_strlen(str);
-	sep_idx = -1;
-	while (str[++sep_idx])
-	{
-		if (str[sep_idx] == sep)
-			break ;
-	}
+	sep_idx = 0;
+	while (str[sep_idx] && str[sep_idx] != sep)
+		sep_idx++;
 	if (sep_idx == str_len)
 		return (0);
-	strs = (char **)malloc(sizeof(char *) * 3);
+	strs = (char **)calloc(3, sizeof(char *));
 	null_guard_double_arr(strs);
-	strs[2] = 0;
-	strs[0] = (char *)malloc(sizeof(char) * (sep_idx + 1));
-	null_guard_arr(strs[0]);
-	strs[1] = (char *)malloc(sizeof(char) * (str_len - sep_idx));
-	null_guard_arr(strs[1]);
-	ft_strlcpy(strs[0], str, sep_idx + 1);
-	ft_strlcpy(strs[1], str + sep_idx + 1, str_len - sep_idx);
+	if (sep_idx != 0)
+	{
+		strs[0] = (char *)malloc(sizeof(char) * (sep_idx + 1));
+		null_guard_arr(strs[0]);
+		ft_strlcpy(strs[0], str, sep_idx + 1);
+	}
+	if (sep_idx != str_len - 1)
+	{
+		strs[1] = (char *)malloc(sizeof(char) * (str_len - sep_idx));
+		null_guard_arr(strs[1]);
+		ft_strlcpy(strs[1], str + sep_idx + 1, str_len - sep_idx);
+	}
 	return (strs);
 }
 
