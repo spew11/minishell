@@ -2,91 +2,83 @@
 
 char	*get_tmp_name(void)
 {
-	static int tmp_num;
-	char	tmp_name[10] = "tmp";
+	static int	tmp_num;
+	char		tmp_name[10] = "tmp";
+
 	tmp_name[3] = tmp_num + '0';
 	tmp_name[4] = '\0';
 	tmp_num++;
 	return (ft_strjoin("./", tmp_name));
 }
 
-// here_list -> tmp_list;
-// here_list->content에 대해 replace_symbol을 하고 quote도 표시
-t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, t_var_lst *env_lst)
+int	append_str_to_list(t_list **list, char *str)
+{
+	t_list	*new;
+
+	new = ft_lstnew(str);
+	if (!new)
+		return (0);
+	ft_lstadd_back(list, new);
+	return (1);
+}
+
+// success -> return file_name;
+// fail -> return NULL;
+char	*read_until_delim(char *delim, t_list **tmp_list)
 {
 	char	*line;
-	char	*delim;
 	char	*tmp_file;
 	int		tmp_fd;
+
+	tmp_file = get_tmp_name(); // malloc
+	if (!tmp_file)
+		return (NULL);
+	tmp_fd = open(tmp_file, O_WRONLY | O_CREAT, 00644);
+	if (tmp_fd < 0)
+	{
+		free(tmp_file);
+		return (NULL);
+	}
+	while (1)
+	{
+		line = readline("mini_here> ");
+		if (!line || !ft_strncmp(line, delim, ft_strlen(delim) + 1))
+			break ;
+		ft_putendl_fd(line, tmp_fd);
+		free(line);
+	}
+	close(tmp_fd);
+	return (tmp_file);
+}
+
+// malloc_err, system_call_err -> NULL
+// success -> tmp_list
+t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, int *err)
+{
+	char	*delim;	
+	char	*tmp_file;
 	t_list	*tmp_list;
 	t_list	*cur;
-
 
 	tmp_list = NULL;
 	cur = here_list;
 	while (cur)
 	{
-		// replace quote
 		delim = cur->content;
-		tmp_file = get_tmp_name(); // malloc
-		tmp_fd = open(tmp_file, O_WRONLY | O_CREAT, 00644);
-		printf("--------------\n");
-		printf(" [delim: %s], [tmp: %s]\n", delim, tmp_file);
-		while (1)
+		tmp_file = read_until_delim(delim, &tmp_list);
+		if (!tmp_file)
 		{
-			line = readline(" mini_here> ");
-			if (!ft_strncmp(line, delim, ft_strlen(delim) + 1))
-				break;
-			// replace env
-			ft_putendl_fd(line, tmp_fd);
-			free(line);
+			ft_lstclear(&tmp_list, ft_free);
+			*err = SYS;
+			return (NULL);
 		}
-		close(tmp_fd);
-		ft_lstadd_back(&tmp_list, ft_lstnew(tmp_file));
+		if (!append_str_to_list(&tmp_list, tmp_file))
+		{
+			ft_lstclear(&tmp_list, ft_free);
+			*err = SYS;
+			return (NULL);
+		}
 		cur = cur->next;
 	}
 	return (tmp_list);
 }
-// void	pre_here_doc(t_cmd_info *cmd_arr, int pipe_num)
-// {
-// 	char	*line;
-// 	char	*delim;
-// 	char	*tmp_file;
-// 	int		tmp_fd;
-// 	int		cmd_i;
-// 	int		redir_i;
-// 	int		here_i;
-
-// 	cmd_i = 0;
-// 	while (cmd_i < pipe_num + 1)
-// 	{
-// 		redir_i = 0;
-// 		here_i = 0;
-// 		while (redir_i < cmd_arr[cmd_i].redir_num)
-// 		{
-// 			if (cmd_arr[cmd_i].redir[redir_i].type == HERE_DOC)
-// 			{
-// 				delim = cmd_arr[cmd_i].redir[redir_i].str;
-// 				tmp_file = get_tmp_name(); // malloc
-// 				tmp_fd = open(tmp_file, O_WRONLY | O_CREAT, 00644);
-// 				while (1)
-// 				{
-// 					line = readline("here> ");
-// 					if (!ft_strncmp(line, delim, ft_strlen(delim) + 1))
-// 						break;
-// 					ft_putstr_fd(line, tmp_fd);
-// 					ft_putstr_fd("\n", tmp_fd);
-// 					free(line);
-// 				}
-// 				cmd_arr[cmd_i].redir[redir_i].type = INFILE;
-// 				cmd_arr[cmd_i].redir[redir_i].str = tmp_file;
-// 				cmd_arr[cmd_i].here[here_i] = ft_strdup(tmp_file);
-// 				free(delim);
-// 				close(tmp_fd);
-// 				here_i++;
-// 			}
-// 			redir_i++;
-// 		}
-// 		cmd_i++;
-// 	}
-// }

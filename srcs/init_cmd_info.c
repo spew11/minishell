@@ -2,9 +2,8 @@
 
 void	token_err(char *str, int *syntax_err)
 {
-	//free함수 만들기
 	if (syntax_err)
-		*syntax_err = 1;
+		*syntax_err = SYN;
 	ft_putstr_fd("token syntax error : `", 2);
 	ft_putstr_fd(str, 2);
 	ft_putstr_fd("\'\n", 2);
@@ -55,9 +54,9 @@ int	init_cmd_argv(t_cmd_info *cmd_info, int *cnt)
 		cmd_info->argv[i] = NULL;
 		i++;
 	}
-	ft_putstr_fd("argv_malloc: ", 2);
-	ft_putnbr_fd(cnt[ARGC] + 1, 2);
-	ft_putchar_fd('\n', 2);
+	// ft_putstr_fd("argv_malloc: ", 2);
+	// ft_putnbr_fd(cnt[ARGC] + 1, 2);
+	// ft_putchar_fd('\n', 2);
 	return (1);
 }
 
@@ -77,9 +76,9 @@ int	init_cmd_redir(t_cmd_info *cmd_info, int *cnt)
 		cmd_info->redir[i].str = NULL;
 		i++;
 	}
-	ft_putstr_fd("redir_malloc: ", 2);
-	ft_putnbr_fd(cnt[REDIR] + 1, 2);
-	ft_putchar_fd('\n', 2);
+	// ft_putstr_fd("redir_malloc: ", 2);
+	// ft_putnbr_fd(cnt[REDIR] + 1, 2);
+	// ft_putchar_fd('\n', 2);
 	return (1);
 }
 
@@ -98,19 +97,19 @@ int	init_cmd_here(t_cmd_info *cmd_info, int *cnt)
 		cmd_info->here[i] = NULL;
 		i++;
 	}
-	ft_putstr_fd("here_malloc: ", 2);
-	ft_putnbr_fd(cnt[HERE] + 1, 2);
-	ft_putchar_fd('\n', 2);
+	// ft_putstr_fd("here_malloc: ", 2);
+	// ft_putnbr_fd(cnt[HERE] + 1, 2);
+	// ft_putchar_fd('\n', 2);
 	return (1);
 }
 
 int	init_cmd_info(t_cmd_info **cmd_info, int cmd_i, int *cnt)
 {
 	if (!init_cmd_argv((*cmd_info + cmd_i), cnt) || \
-		!init_cmd_redir((*cmd_info + cmd_i), cnt) \
-		|| !init_cmd_here((*cmd_info + cmd_i), cnt))
+		!init_cmd_redir((*cmd_info + cmd_i), cnt) || \
+		!init_cmd_here((*cmd_info + cmd_i), cnt))
 		return (0);
-	printf("[argc: %d, redir: %d]\n", cnt[ARGC], cnt[REDIR]);
+	// printf("[argc: %d, redir: %d]\n", cnt[ARGC], cnt[REDIR]);
 	cnt[ARGC] = 0;
 	cnt[REDIR] = 0;
 	cnt[HERE] = 0;
@@ -123,11 +122,11 @@ void	init_para(int *p_cmd_i, int *cnt)
 	cnt[REDIR] = 0;
 	cnt[HERE] = 0;
 }
-int	pipe_err(int *cnt, char *token, char *err_str)
+int	pipe_err(int *cnt, char *token, char **err_str)
 {
 	if (!cnt[ARGC] && !cnt[REDIR])
 	{
-		err_str = token;
+		*err_str = token;
 		return (0);
 	}
 	return (1);
@@ -144,11 +143,11 @@ int	is_here(char *token)
 		return (1);
 	return (0);
 }
-int	check_redir_err(char *token, char *err_str)
+int	check_redir_err(char *token, char **err_str)
 {
 	if (is_redir(token) || is_pipe(token))
 	{
-		err_str = token;
+		*err_str = token;
 		return (1);
 	}
 	return (0);
@@ -170,15 +169,15 @@ int	append_here_list(t_cmd_info **cmd_info_arr, t_list **here_list, char *token)
 	ft_lstadd_back(here_list, new);
 	return (1);
 }
-// stntax_err -> err_str설정 return (0)
+// stntax_err -> err_str != NULL (but not malloc) return (0)
 // malloc_err -> return (0)
 // success -> return (1)
 int	malloc_cmd_info_arr(t_cmd_info **cmd_info_arr, t_list *cur, \
-	t_list **here_list, char *err_str)
+	t_list **here_list, char **err_str)
 {
 	int	cmd_i;
 	int	cnt[3];
-	
+
 	init_para(&cmd_i, cnt);
 	while (cur)
 	{
@@ -190,7 +189,7 @@ int	malloc_cmd_info_arr(t_cmd_info **cmd_info_arr, t_list *cur, \
 			if ((cur->next && check_redir_err(cur->next->content, err_str)) || \
 				(is_here(cur -> content) && cur->next && ++cnt[HERE] && \
 				!append_here_list(cmd_info_arr, here_list, cur->next->content)))
-					return (0);
+				return (0);
 			if (++cnt[REDIR] && cur->next)
 				cur = cur -> next;
 		}
@@ -202,20 +201,25 @@ int	malloc_cmd_info_arr(t_cmd_info **cmd_info_arr, t_list *cur, \
 		return (0);
 	return (1);
 }
-// malloc_err -> cmd_info = NULL
-// syntax_err -> cmd_info != NULL
+
+// malloc_err -> cmd_info == NULL
+// syntax_err -> cmd_info && syntax_err == 1
+// success -> cmd_info && syntax_err == 0
+// do not free token_list
 t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, \
 			t_list **here_list, int *syntax_err)
 {
 	t_cmd_info	*cmd_info_arr;
 	char		*err_str;
 
+	*here_list = NULL;
+	*syntax_err = NONE;
 	cmd_info_arr = malloc(sizeof(t_cmd_info) * (pipe_num + 1)); // malloc
 	if (!cmd_info_arr)
 		return (NULL);
 	init_cmd_info_val(cmd_info_arr, pipe_num);
 	err_str = NULL; // not malloc
-	if (!malloc_cmd_info_arr(&cmd_info_arr, token_list, here_list, err_str))
+	if (!malloc_cmd_info_arr(&cmd_info_arr, token_list, here_list, &err_str))
 	{
 		if (err_str)
 			token_err(err_str, syntax_err);
