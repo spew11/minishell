@@ -1,6 +1,6 @@
 #include "./parse.h"
 
-char	*get_tmp_name(void)
+static char	*get_tmp_name(void)
 {
 	static int	tmp_num;
 	char		tmp_name[10] = "tmp";
@@ -11,7 +11,7 @@ char	*get_tmp_name(void)
 	return (ft_strjoin("./", tmp_name));
 }
 
-int	append_str_to_list(t_list **list, char *str)
+static int	append_str_to_list(t_list **list, char *str)
 {
 	t_list	*new;
 
@@ -24,13 +24,13 @@ int	append_str_to_list(t_list **list, char *str)
 
 // success -> return file_name;
 // fail -> return NULL;
-char	*read_until_delim(char *delim, t_list **tmp_list)
+static char	*read_until_delim(char *delim, t_list **tmp_list)
 {
 	char	*line;
 	char	*tmp_file;
 	int		tmp_fd;
 
-	tmp_file = get_tmp_name(); // malloc
+	tmp_file = get_tmp_name();
 	if (!tmp_file)
 		return (NULL);
 	tmp_fd = open(tmp_file, O_WRONLY | O_CREAT, 00644);
