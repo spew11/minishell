@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/16 16:06:34 by eunjilee          #+#    #+#             */
+/*   Updated: 2022/12/16 16:52:57 by eunjilee         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-void	get_eof(char *line)
+static void	get_eof(char *line)
 {
 	if (!line)
 	{
@@ -28,7 +40,6 @@ int	minishell(t_shell_info *shell_info)
 		cmd_infos = parse_line(line, &pipe_num,
 				shell_info->externs->env_lst);
 		free(line);
-
 		if (cmd_infos)
 		{
 			ret = run_cmds(cmd_infos, pipe_num, shell_info);
@@ -36,37 +47,6 @@ int	minishell(t_shell_info *shell_info)
 		}
 	}
 	return (ret);
-}
-
-void	clear_shell_info(t_shell_info *shell_info)
-{
-	clear_var_lst(shell_info->externs->env_lst);
-	clear_var_lst(shell_info->externs->export_lst);
-	free_double_arr(shell_info->externs->env_arr);
-	return ;
-}
-
-void	init_term(struct termios *term)
-{
-	tcgetattr(0, term);
-	term->c_lflag &= ~(ECHOCTL);
-	tcsetattr(0, TCSANOW, term);
-	return ;
-}
-
-void	init_shell_info(t_shell_info *shell_info, char *envp[])
-{
-	shell_info->externs = (t_externs *)malloc(sizeof(t_externs) * 1);
-	if (!shell_info->externs)
-	{
-		ft_putendl_fd(strerror(errno), 2);
-		exit(1);
-	}
-	shell_info->externs->env_lst = init_var_lst(envp);
-	shell_info->externs->export_lst = init_var_lst(envp);
-	sort_var_lst(shell_info->externs->export_lst);
-	shell_info->externs->env_arr = 0;
-	return ;
 }
 
 int	main(int argc, char *argv[], char *envp[])
@@ -80,7 +60,7 @@ int	main(int argc, char *argv[], char *envp[])
 		ft_putendl_fd("too many arguments", 2);
 		return (1);
 	}
-	exit_status = 0;
+	g_exit_status = 0;
 	init_term(&term);
 	init_shell_info(&shell_info, envp);
 	signal_on();
