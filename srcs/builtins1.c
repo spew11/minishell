@@ -6,13 +6,13 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:05 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/16 16:08:09 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/17 17:41:07 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_exit(int argc, char *argv[])
+void	ft_exit(int argc)
 {
 	ft_putendl_fd("exit", 1);
 	if (argc > 1)
@@ -23,7 +23,7 @@ void	ft_exit(int argc, char *argv[])
 	exit(0);
 }
 
-int	echo(int argc, char *argv[], t_var_lst *env_lst)
+int	echo(int argc, char *argv[])
 {
 	char	*str;
 	int		opt_f;
@@ -51,7 +51,7 @@ int	echo(int argc, char *argv[], t_var_lst *env_lst)
 	return (0);
 }
 
-static int	cd_to_path(char *argv[], char *home_path, char **paths)
+static int	cd_to_path(char *home_path, char **paths)
 {
 	struct stat	statbuf;
 	int			i;
@@ -97,7 +97,7 @@ int	cd(int argc, char *argv[], t_var_lst *env_lst)
 		return (1);
 	}
 	paths = ft_split(argv[1], '/');
-	ret = cd_to_path(argv, home_path, paths);
+	ret = cd_to_path(home_path, paths);
 	free_double_arr(paths);
 	return (ret);
 }

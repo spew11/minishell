@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:34 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/16 16:52:57 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/17 17:39:27 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	minishell(t_shell_info *shell_info)
 		if (cmd_infos)
 		{
 			ret = run_cmds(cmd_infos, pipe_num, shell_info);
-			//free_cmd_infos;
+			cmd_info_free(&cmd_infos, pipe_num);
 		}
 	}
 	return (ret);
@@ -55,6 +55,7 @@ int	main(int argc, char *argv[], char *envp[])
 	t_shell_info	shell_info;
 	int				ret;
 
+	(void)argv;
 	if (argc > 1)
 	{
 		ft_putendl_fd("too many arguments", 2);

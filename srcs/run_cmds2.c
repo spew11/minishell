@@ -6,13 +6,13 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:44 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/16 16:36:29 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/17 17:55:55 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	set_input(int *in_fd, int type, char *filename)
+static int	set_input(int *in_fd, char *filename)
 {
 	if (ft_access(filename) == -1)
 	{
@@ -43,7 +43,7 @@ static int	set_output(int *out_fd, int type, char *filename)
 	{
 		if (*out_fd != -1)
 			close(*out_fd);
-		*out_fd = open(filename, O_WRONLY | O_TRUNC | O_APPEND | O_CREAT, 0644);
+		*out_fd = open(filename, O_WRONLY | O_APPEND | O_CREAT, 0644);
 	}
 	if (*out_fd < 0)
 	{
@@ -69,7 +69,7 @@ static int	set_io(t_cmd_info *cmd_info, int *in_fd, int *out_fd)
 		filename = cmd_info->redir[i].str;
 		if (type == INFILE || type == HERE_DOC)
 		{
-			if (set_input(in_fd, type, filename))
+			if (set_input(in_fd, filename))
 				return (1);
 		}
 		else

@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:45:53 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/16 16:57:41 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/17 17:44:00 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ void		run_binary(int argc, char *argv[], t_externs *externs);
 int			run_cmd(t_cmd_info *cmd_info, t_externs *externs);
 int			run_cmds(t_cmd_info *cmd_infos,
 				int pipe_num, t_shell_info *shell_info);
-int			echo(int argc, char *argv[], t_var_lst *env_lst);
+int			echo(int argc, char *argv[]);
 int			cd(int argc, char *argv[], t_var_lst *env_lst);
 void		print_var_lst(t_var_lst *var_lst);
 char		**ft_slice(char *str, char sep);
@@ -99,7 +99,7 @@ int			export(int argc, char *argv[],
 void		sort_var_lst(t_var_lst *var_lst);
 void		add_var_lst(t_var_lst **var_lst, char *var, char *val);
 char		*ft_getenv(t_var_lst *env_lst, char *var);
-int			env(int argc, char *argv[], t_var_lst *env_lst);
+int			env(int argc, t_var_lst *env_lst);
 void		remove_var_lst(t_var_lst **var_lst, char *var);
 int			pwd(void);
 int			unset(int argc, char *argv[],
@@ -107,7 +107,7 @@ int			unset(int argc, char *argv[],
 int			chk_var_name(char *var_name);
 void		var_name_err(void);
 char		**env_lst2arr(t_var_lst *env_lst);
-void		ft_exit(int argc, char *argv[]);
+void		ft_exit(int argc);
 int			is_builtin(char *cmd);
 int			exec_builtin(int argc, char *argv[],
 				t_var_lst **env_lst, t_var_lst **export_lst);
@@ -123,4 +123,5 @@ void		wait_pids(pid_t *pid_arr, int pipe_num);
 void		unlink_tmpfiles(t_cmd_info *cmd_infos, int pipe_num);
 int			ft_access(const char *pathname);
 int			pid_err(void);
+void		cmd_info_free(t_cmd_info **cmd_info_arr, int pipe_num);
 #endif

@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:07:03 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/16 16:07:04 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/17 17:54:14 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ int	exec_builtin(int argc, char *argv[],
 		t_var_lst **env_lst, t_var_lst **export_lst)
 {
 	if (ft_strncmp(argv[0], "echo", -1) == 0)
-		return (echo(argc, argv, *env_lst));
+		return (echo(argc, argv));
 	if (ft_strncmp(argv[0], "cd", -1) == 0)
 		return (cd(argc, argv, *env_lst));
 	if (ft_strncmp(argv[0], "pwd", -1) == 0)
@@ -79,8 +79,8 @@ int	exec_builtin(int argc, char *argv[],
 	if (ft_strncmp(argv[0], "unset", -1) == 0)
 		return (unset(argc, argv, env_lst, export_lst));
 	if (ft_strncmp(argv[0], "env", -1) == 0)
-		return (env(argc, argv, *env_lst));
+		return (env(argc, *env_lst));
 	if (ft_strncmp(argv[0], "exit", -1) == 0)
-		(ft_exit(argc, argv));
+		(ft_exit(argc));
 	return (1);
 }

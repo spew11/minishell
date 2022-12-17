@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:55 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/16 16:54:03 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/17 17:51:38 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int	chk_var_name(char *var_name)
 char	**ft_slice(char *str, char sep)
 {
 	char	**strs;
-	int		sep_idx;
+	size_t	sep_idx;
 	size_t	str_len;
 
 	str_len = ft_strlen(str);
@@ -63,30 +63,33 @@ char	**ft_slice(char *str, char sep)
 	return (strs);
 }
 
-static void	sig_handler(int signal)
+static void	sig_handler(int sig_t)
 {
 	pid_t	pid;
 	int		status;
 
-	pid = waitpid(-1, &status, WNOHANG);
-	if (pid == -1)
+	if (sig_t == SIGINT)
 	{
-		printf("\n");
-		if (rl_on_new_line() == -1)
-			exit(1);
-		rl_replace_line("", 1);
-		rl_redisplay();
-		g_exit_status = 1;
-	}
-	else
-	{
-		printf("\n");
+		pid = waitpid(-1, &status, WNOHANG);
+		if (pid == -1)
+		{
+			printf("\n");
+			if (rl_on_new_line() == -1)
+				exit(1);
+			rl_replace_line("", 1);
+			rl_redisplay();
+			g_exit_status = 1;
+		}
+		else
+		{
+			printf("\n");
+		}
 	}
 	return ;
 }
 
 void	signal_on(void)
 {
-	signal(SIGINT, sig_handler);
+	signal(SIGINT, (void *)sig_handler);
 	signal(SIGQUIT, SIG_IGN);
 }

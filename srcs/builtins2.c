@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:12 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/16 16:06:13 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/17 17:43:30 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ int	unset(int argc, char *argv[], t_var_lst **env_lst, t_var_lst **export_lst)
 	return (0);
 }
 
-int	env(int argc, char *argv[], t_var_lst *env_lst)
+int	env(int argc, t_var_lst *env_lst)
 {
 	if (argc != 1)
 	{

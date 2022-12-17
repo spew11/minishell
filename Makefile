@@ -6,7 +6,7 @@
 #    By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/05 21:09:19 by eunjilee          #+#    #+#              #
-#    Updated: 2022/12/17 14:19:12 by eunjilee         ###   ########.fr        #
+#    Updated: 2022/12/17 17:38:03 by eunjilee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -51,13 +51,13 @@ LIBFT = $(addprefix $(LIBFT_DIR), $(LIBFT_NAME))
 all: $(NAME)
 
 .c.o :
-		$(CC) $(CCFLAGS2) -c -o $(<:.c=.o) $<
+		$(CC) $(CCFLAGS) $(CCFLAGS2) -c -o $(<:.c=.o) $<
 
 $(LIBFT):
 		make -C $(LIBFT_DIR) bonus
 
 $(NAME): $(OBJS) $(LIBFT)
-		$(CC) $(CCFLAGS1) -o $(NAME) $(OBJS) $(LIBFT)
+		$(CC) $(CCFLAGS) $(CCFLAGS1) -o $(NAME) $(OBJS) $(LIBFT)
 
 clean:
 		rm -f $(OBJS)

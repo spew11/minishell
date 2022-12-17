@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:07:16 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/16 16:20:54 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/17 17:55:03 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ void	add_var_lst(t_var_lst **var_lst, char *var, char *val)
 {
 	t_var_lst	*now;
 
+	now = 0;
 	if (*var_lst)
 	{
 		add_var_lst_1(var_lst, var, val, now);
