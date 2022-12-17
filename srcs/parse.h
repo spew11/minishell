@@ -38,19 +38,34 @@ enum	e_opt {
 	HERE,
 };
 
-t_list *divide_line_into_token(char *line);
+enum	e_idx {
+	AV = 0,
+	RE = 1,
+	CMD = 3,
+};
+
+enum	e_err {
+	SYS = -1,
+	NONE = 0,
+	SYN = 1,
+};
+
+t_list *divide_line_into_token(char *line, int *pipe_num);
 t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, t_list **here_list, int *syntax_err);
 int	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *token_list, t_list *tmp_list, t_var_lst *env_lst);
-t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, t_var_lst *env_lst);
+t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, int *err);
 void	token_err(char *str, int *syntax_err);
-// temp 
+void	cmd_info_free(t_cmd_info **cmd_info_arr, int pipe_num);
+// temp
+int	is_pipe(char *token);
+void	ft_free(void *ptr);
 t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst);
 void print(void *ptr);
 void	print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num);
 t_var_lst *init_var_lst(char *envp[]);
 char *find_env(t_var_lst *env_lst, char *str);
 int	is_redir(char *str);
-int	append_buff_to_list(char *buff, int *buf_i, t_list **list);
+int	buff_to_list(char *buff, int *buf_i, t_list **list);
 
 /*
 

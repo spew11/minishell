@@ -2,9 +2,8 @@
 
 void	token_err(char *str, int *syntax_err)
 {
-	//free함수 만들기
 	if (syntax_err)
-		*syntax_err = 1;
+		*syntax_err = SYN;
 	ft_putstr_fd("token syntax error : `", 2);
 	ft_putstr_fd(str, 2);
 	ft_putstr_fd("\'\n", 2);
@@ -55,6 +54,9 @@ int	init_cmd_argv(t_cmd_info *cmd_info, int *cnt)
 		cmd_info->argv[i] = NULL;
 		i++;
 	}
+	// ft_putstr_fd("argv_malloc: ", 2);
+	// ft_putnbr_fd(cnt[ARGC] + 1, 2);
+	// ft_putchar_fd('\n', 2);
 	return (1);
 }
 
@@ -66,7 +68,7 @@ int	init_cmd_redir(t_cmd_info *cmd_info, int *cnt)
 	cmd_info->redir_num = cnt[REDIR];
 	cmd_info->redir = malloc(sizeof(t_redir) * (cnt[REDIR] + 1));
 	if (!cmd_info->redir)
-		return (1);
+		return (0);
 	i = 0;
 	while (i < cnt[REDIR] + 1)
 	{
@@ -74,17 +76,20 @@ int	init_cmd_redir(t_cmd_info *cmd_info, int *cnt)
 		cmd_info->redir[i].str = NULL;
 		i++;
 	}
+	// ft_putstr_fd("redir_malloc: ", 2);
+	// ft_putnbr_fd(cnt[REDIR] + 1, 2);
+	// ft_putchar_fd('\n', 2);
 	return (1);
 }
 
-int init_cmd_here(t_cmd_info *cmd_info, int *cnt)
+int	init_cmd_here(t_cmd_info *cmd_info, int *cnt)
 {
 	int	i;
 
 	i = 0;
 	cmd_info->here_num = cnt[HERE];
 	cmd_info->here = malloc(sizeof(char *) * (cnt[HERE] + 1));
-	if (cmd_info->here)
+	if (!cmd_info->here)
 		return (0);
 	i = 0;
 	while (i < cnt[HERE] + 1)
@@ -92,76 +97,134 @@ int init_cmd_here(t_cmd_info *cmd_info, int *cnt)
 		cmd_info->here[i] = NULL;
 		i++;
 	}
+	// ft_putstr_fd("here_malloc: ", 2);
+	// ft_putnbr_fd(cnt[HERE] + 1, 2);
+	// ft_putchar_fd('\n', 2);
 	return (1);
 }
 
-int	init_cmd_info(t_cmd_info *cmd_info, int *cnt)
+int	init_cmd_info(t_cmd_info **cmd_info, int cmd_i, int *cnt)
 {
-	if (!init_cmd_argv(cmd_info, cnt))
+	if (!init_cmd_argv((*cmd_info + cmd_i), cnt) || \
+		!init_cmd_redir((*cmd_info + cmd_i), cnt) || \
+		!init_cmd_here((*cmd_info + cmd_i), cnt))
 		return (0);
-	if (!init_cmd_redir(cmd_info, cnt))
-		return (0);
-	if (!init_cmd_here(cmd_info, cnt))
-		return (0);
-	return (1);
-}
-
-t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, t_list **here_list, int *syntax_err)
-{
-	t_cmd_info	*cmd_info_arr;
-	t_list		*cur;
-	int			cmd_i;
-	int			cnt[3];
-
-	cmd_info_arr = malloc(sizeof(t_cmd_info) * (pipe_num + 1)); //malloc
-	if (!cmd_info_arr)
-		return (NULL);
-	init_cmd_info_val(cmd_info_arr, pipe_num);
+	// printf("[argc: %d, redir: %d]\n", cnt[ARGC], cnt[REDIR]);
 	cnt[ARGC] = 0;
 	cnt[REDIR] = 0;
 	cnt[HERE] = 0;
-	cur = token_list;
-	cmd_i = 0;
-	// 파이프 마지막 전까지의 cmd_info를 malloc
+	return (1);
+}
+void	init_para(int *p_cmd_i, int *cnt)
+{
+	*p_cmd_i = 0;
+	cnt[ARGC] = 0;
+	cnt[REDIR] = 0;
+	cnt[HERE] = 0;
+}
+int	pipe_err(int *cnt, char *token, char **err_str)
+{
+	if (!cnt[ARGC] && !cnt[REDIR])
+	{
+		*err_str = token;
+		return (0);
+	}
+	return (1);
+}
+int	is_pipe(char *token)
+{
+	if (!ft_strncmp(token, "|", 2))
+		return (1);
+	return (0);
+}
+int	is_here(char *token)
+{
+	if (!ft_strncmp(token, "<<", 3))
+		return (1);
+	return (0);
+}
+int	check_redir_err(char *token, char **err_str)
+{
+	if (is_redir(token) || is_pipe(token))
+	{
+		*err_str = token;
+		return (1);
+	}
+	return (0);
+}
+int	append_here_list(t_cmd_info **cmd_info_arr, t_list **here_list, char *token)
+{
+	char	*delim;
+	t_list	*new;
+
+	delim = ft_strdup(token);
+	if (!delim)
+		return (0);
+	new = ft_lstnew(delim);
+	if (!new)
+	{
+		free(delim);
+		return (0);
+	}
+	ft_lstadd_back(here_list, new);
+	return (1);
+}
+// stntax_err -> err_str != NULL (but not malloc) return (0)
+// malloc_err -> return (0)
+// success -> return (1)
+int	malloc_cmd_info_arr(t_cmd_info **cmd_info_arr, t_list *cur, \
+	t_list **here_list, char **err_str)
+{
+	int	cmd_i;
+	int	cnt[3];
+
+	init_para(&cmd_i, cnt);
 	while (cur)
 	{
-		if (!ft_strncmp(cur -> content, "|", 2))
-		{
-			if (!cnt[ARGC] && !cnt[REDIR])
-			{
-				token_err(cur -> content, syntax_err);
-				return (cmd_info_arr);
-			}
-			init_cmd_info(cmd_info_arr + cmd_i, cnt);
-			printf("[argc: %d, redir: %d]\n", cnt[ARGC], cnt[REDIR]);
-			cnt[ARGC] = 0;
-			cnt[REDIR] = 0;
-			cnt[HERE] = 0;
-			cmd_i++;
-		}
+		if (is_pipe(cur->content) && (!pipe_err(cnt, cur->content, err_str) || \
+			!init_cmd_info(cmd_info_arr, cmd_i++, cnt)))
+			return (0);
 		else if (is_redir(cur -> content))
 		{
-			if (cur->next && (is_redir(cur->next->content) || !ft_strncmp(cur->next->content, "|", 2)))
-			{
-				token_err(cur->next->content, syntax_err);
-				return (cmd_info_arr);
-			}
-			cnt[REDIR] += 1;
-			if (!ft_strncmp(cur -> content, "<<", 3) && cur->next)
-			{
-				cnt[HERE] += 1;
-				ft_lstadd_back(here_list, ft_lstnew(ft_strdup(cur->next->content)));
-			}
-			if (cur->next)
+			if ((cur->next && check_redir_err(cur->next->content, err_str)) || \
+				(is_here(cur -> content) && cur->next && ++cnt[HERE] && \
+				!append_here_list(cmd_info_arr, here_list, cur->next->content)))
+				return (0);
+			if (++cnt[REDIR] && cur->next)
 				cur = cur -> next;
 		}
-		else
+		else if (!is_pipe(cur->content))
 			cnt[ARGC] += 1;
 		cur = cur -> next;
 	}
-	// 파이프의 마지막 or 파이프가 없는 상항 malloc
-	init_cmd_info(cmd_info_arr + cmd_i, cnt);
-	printf("[argc: %d, redir: %d]\n", cnt[ARGC], cnt[REDIR]);
-	// cmd_info_arr은 마지막에 null을 넣지않고 pipe_num으로 다뤄줘야한다.
-	return (cmd_info_arr);
+	if (!init_cmd_info(cmd_info_arr, cmd_i, cnt))
+		return (0);
+	return (1);
+}
+
+// malloc_err -> cmd_info == NULL
+// syntax_err -> cmd_info && syntax_err == 1
+// success -> cmd_info && syntax_err == 0
+// do not free token_list
+t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, \
+			t_list **here_list, int *syntax_err)
+{
+	t_cmd_info	*cmd_info_arr;
+	char		*err_str;
+
+	*here_list = NULL;
+	*syntax_err = NONE;
+	cmd_info_arr = malloc(sizeof(t_cmd_info) * (pipe_num + 1)); // malloc
+	if (!cmd_info_arr)
+		return (NULL);
+	init_cmd_info_val(cmd_info_arr, pipe_num);
+	err_str = NULL; // not malloc
+	if (!malloc_cmd_info_arr(&cmd_info_arr, token_list, here_list, &err_str))
+	{
+		if (err_str)
+			token_err(err_str, syntax_err);
+		else
+			cmd_info_free(&cmd_info_arr, pipe_num);
+	}
+	return (cmd_info_arr);// cmd_info_arr은 마지막에 null을 넣지않고 pipe_num으로 다뤄줘야한다.
 }

@@ -5,6 +5,23 @@ void	ft_free(void *ptr)
 	free(ptr);
 }
 
+int count_pipe(t_list *token_list)
+{
+	t_list	*cur;
+	int		pipe_num;
+
+	cur = token_list;
+	pipe_num = 0;
+	while (cur)
+	{
+		if (!ft_strncmp(cur->content, "|", 2))
+			pipe_num += 1;
+		cur = cur -> next;
+	}
+	return (pipe_num);
+}
+
+
 int	is_new_token(char *str, int jdx, char *buff)
 {
 	if (str[jdx] == '|')
@@ -79,11 +96,11 @@ t_list	*split_by_space(char *line)
 		unclosed_quote_err(&spl_list);
 	else if (start_i != line_i)
 		ft_lstadd_back(&spl_list, ft_lstnew(ft_substr(line, start_i, line_i - start_i)));// null가드
-	ft_lstiter(spl_list, print);printf("\n");
+	// ft_lstiter(spl_list, print);printf("\n");
 	return (spl_list);
 }
 
-int	append_buff_to_list(char *buff, int *buf_i, t_list **token_list)
+int	buff_to_list(char *buff, int *buf_i, t_list **list)
 {
 	char	*str;
 	t_list	*new;
@@ -92,19 +109,19 @@ int	append_buff_to_list(char *buff, int *buf_i, t_list **token_list)
 	str = ft_strdup(buff);
 	if (!str)
 	{
-		ft_lstclear(token_list, ft_free);
+		ft_lstclear(list, ft_free);
 		free(buff);
 		return (0);
 	}
 	new = ft_lstnew(str);
 	if (!new)
 	{
-		ft_lstclear(token_list, ft_free);
+		ft_lstclear(list, ft_free);
 		free(str);
 		free(buff);
 		return (0);
 	}
-	ft_lstadd_back(token_list, new);
+	ft_lstadd_back(list, new);
 	ft_bzero(buff, ft_strlen(buff) + 1);
 	*buf_i = 0;
 	return (1);
@@ -124,7 +141,7 @@ int	get_token_from_spl(t_list **token_list, char *str)
 	while (str[str_i])
 	{
 		if (buf_i && !quote_flag && is_new_token(str, str_i, buff) \
-			&& !append_buff_to_list(buff, &buf_i, token_list))
+			&& !buff_to_list(buff, &buf_i, token_list))
 			return (0);
 		if (!quote_flag && (str[str_i] == '\'' || str[str_i] == '\"'))
 			quote_flag = str[str_i];
@@ -132,13 +149,15 @@ int	get_token_from_spl(t_list **token_list, char *str)
 			quote_flag = 0;
 		buff[buf_i++] = str[str_i++];
 	}
-	if (!append_buff_to_list(buff, &buf_i, token_list))
+	if (!buff_to_list(buff, &buf_i, token_list))
 		return (0);
 	free(buff);
 	return (1);
 }
 
-t_list	*divide_line_into_token(char *line)
+// malloc_err -> NULL
+// succcess -> token_list
+t_list	*divide_line_into_token(char *line, int *pipe_num)
 {
 	t_list	*token_list;
 	t_list	*spl_list;
@@ -159,5 +178,6 @@ t_list	*divide_line_into_token(char *line)
 		spl_cur = spl_cur->next;
 	}
 	ft_lstclear(&spl_list, ft_free);
+	*pipe_num = count_pipe(token_list);
 	return (token_list);
 }
