@@ -47,7 +47,10 @@ t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, \
 		if (err_str)
 			token_err(err_str, syntax_err);
 		else
+		{
 			cmd_info_free(&cmd_info_arr, pipe_num);
+			ft_lstclear(here_list, ft_free);
+		}
 	}
 	return (cmd_info_arr);
 }

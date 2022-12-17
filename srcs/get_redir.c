@@ -19,7 +19,6 @@ int	get_here_doc(t_cmd_info *cmd_info_arr, t_list *cur_token, \
 {
 	char	*tmp_file;
 
-	cmd_info_arr[idx[CMD]].redir[idx[RE]].type = get_type(cur_token->content);
 	cmd_info_arr[idx[CMD]].redir[idx[RE]].type = INFILE;
 	tmp_file = ft_strdup((*cur_tmp)->content);
 	if (!tmp_file)

@@ -1,5 +1,19 @@
 #include "./parse.h"
 
+void	tmp_clear(t_list **tmp_list)
+{
+	t_list	*cur;
+
+	cur = *tmp_list;
+	while (cur)
+	{
+		unlink(cur->content);
+		cur = cur->next;
+	}
+	ft_lstclear(tmp_list, ft_free);
+	*tmp_list = NULL;
+}
+
 static char	*get_tmp_name(void)
 {
 	static int	tmp_num;
@@ -24,7 +38,7 @@ static int	append_str_to_list(t_list **list, char *str)
 
 // success -> return file_name;
 // fail -> return NULL;
-static char	*read_until_delim(char *delim, t_list **tmp_list)
+static char	*read_until_delim(char *delim)
 {
 	char	*line;
 	char	*tmp_file;
@@ -58,27 +72,26 @@ t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, int *err)
 	char	*delim;	
 	char	*tmp_file;
 	t_list	*tmp_list;
-	t_list	*cur;
+	t_list	*cur_here;
 
 	tmp_list = NULL;
-	cur = here_list;
-	while (cur)
+	cur_here = here_list;
+	while (cur_here && err != NONE)
 	{
-		delim = cur->content;
-		tmp_file = read_until_delim(delim, &tmp_list);
+		delim = cur_here->content;
+		tmp_file = read_until_delim(delim);
 		if (!tmp_file)
 		{
-			ft_lstclear(&tmp_list, ft_free);
+			tmp_clear(&tmp_list);
 			*err = SYS;
-			return (NULL);
 		}
 		if (!append_str_to_list(&tmp_list, tmp_file))
 		{
-			ft_lstclear(&tmp_list, ft_free);
+			free(tmp_file);
+			tmp_clear(&tmp_list);
 			*err = SYS;
-			return (NULL);
 		}
-		cur = cur->next;
+		cur_here = cur_here->next;
 	}
 	return (tmp_list);
 }

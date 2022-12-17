@@ -1,5 +1,17 @@
 #include "./parse.h"
 
+static void	init_para(t_list **p_lst, int *num1, int *num2, int *num3)
+{
+	if (p_lst)
+		*p_lst = NULL;
+	if (num1)
+		*num1 = 0;
+	if (num2)
+		*num2 = 0;
+	if (num3)
+		*num3 = 0;
+}
+
 static int count_pipe(t_list *token_list)
 {
 	t_list	*cur;
@@ -45,6 +57,7 @@ static int	get_token_from_spl(t_list **token_list, char *str)
 	int		quote_flag;
 
 	buff = malloc(sizeof(char) * (ft_strlen(str) + 1));
+	ft_bzero(buff, sizeof(char) * (ft_strlen(str) + 1));
 	if (!buff)
 		return (0);
 	init_para(NULL, &str_i, &buf_i, &quote_flag);
@@ -64,28 +77,27 @@ static int	get_token_from_spl(t_list **token_list, char *str)
 	free(buff);
 	return (1);
 }
-
 // malloc_err -> NULL
 // succcess -> token_list
 t_list	*divide_line_into_token(char *line, int *pipe_num)
 {
 	t_list	*token_list;
 	t_list	*spl_list;
-	t_list	*spl_cur;
+	t_list	*cur_spl;
 
 	spl_list = split_by_space(line);
 	if (!spl_list)
 		return (NULL);
 	token_list = NULL;
-	spl_cur = spl_list;
-	while (spl_cur)
+	cur_spl = spl_list;
+	while (cur_spl)
 	{
-		if (!get_token_from_spl(&token_list, (char *)(spl_cur->content)))
+		if (!get_token_from_spl(&token_list, (char *)(cur_spl->content)))
 		{
 			ft_lstclear(&spl_list, ft_free);
 			return (NULL);
 		}
-		spl_cur = spl_cur->next;
+		cur_spl = cur_spl->next;
 	}
 	ft_lstclear(&spl_list, ft_free);
 	*pipe_num = count_pipe(token_list);

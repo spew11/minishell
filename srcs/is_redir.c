@@ -26,3 +26,17 @@ int	is_here(char *token)
 		return (1);
 	return (0);
 }
+
+int is_quote(char ch)
+{
+	if (ch == '\'' || ch == '\"')
+		return (1);
+	return (0);
+}
+
+int	is_env(int quote, char ch)
+{
+	if (ch == '$' && (quote != '\''))
+		return (1);
+	return (0);
+}

@@ -61,7 +61,6 @@ int	init_cmd_info(t_cmd_info **cmd_info, int cmd_i, int *cnt)
 		!init_cmd_redir((*cmd_info + cmd_i), cnt) || \
 		!init_cmd_here((*cmd_info + cmd_i), cnt))
 		return (0);
-	// printf("[argc: %d, redir: %d]\n", cnt[ARGC], cnt[REDIR]);
 	cnt[ARGC] = 0;
 	cnt[REDIR] = 0;
 	cnt[HERE] = 0;

@@ -44,7 +44,6 @@ int	get_type(char *str)
 		return (FILE_APPEND);
 	return (0);
 }
-
 // malloc_err -> -1
 // syntax_err -> 1
 // success -> 0
@@ -68,12 +67,12 @@ int	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *cur_token, \
 				err = get_redir(cmd_info_arr, cur_token, idx, env_lst);
 			cur_token = cur_token->next;
 		}
-		else
+		else if (!is_pipe(cur_token->content) && !is_redir(cur_token->content))
 			cmd_info_arr[idx[CMD]].argv[idx[AV]++] \
 			= replace_symbol_to_text(cur_token->content, env_lst, &err);
 		if (err != NONE)
 			return (ft_err(err));
-		cur_token = cur_token -> next;
+		cur_token = cur_token->next;
 	}
 	return (NONE);
 }

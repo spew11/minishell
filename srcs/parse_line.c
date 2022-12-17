@@ -1,33 +1,21 @@
 #include "parse.h"
 
-void	cmd_info_free(t_cmd_info **cmd_info_arr, int pipe_num)
+static void ft_clear_list(t_list **token_list, t_list **tmp_list)
 {
-	int	i;
-
-	i = 0;
-	while (i < pipe_num + 1)
-	{
-		if ((*cmd_info_arr)[i].argv)
-			free((*cmd_info_arr)[i].argv);
-		if ((*cmd_info_arr)[i].redir)
-			free((*cmd_info_arr)[i].redir);
-		if ((*cmd_info_arr)[i].here)
-			free((*cmd_info_arr)[i].here);
-		i++;
-	}
-	free(*cmd_info_arr);
-	*cmd_info_arr = NULL;
+	ft_lstclear(token_list, ft_free);
+	ft_lstclear(tmp_list, ft_free);
 }
+
 static t_cmd_info	*sys_call_err(t_list **token_list, \
 			t_cmd_info **cmd_info_arr, int pipe_num, t_list **tmp_list)
 {
 	perror("minishell");
-	if (*token_list)
+	if (token_list)
 		ft_lstclear(token_list, ft_free);
-	if (*cmd_info_arr)
+	if (cmd_info_arr)
 		cmd_info_free(cmd_info_arr, pipe_num);
-	if (*tmp_list)
-		ft_lstclear(tmp_list, ft_free);
+	if (tmp_list)
+		tmp_clear(tmp_list);
 	return (NULL);
 }
 
@@ -50,23 +38,21 @@ t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst)
 	token_list = divide_line_into_token(line, pipe_num);
 	if (!token_list)
 		return (sys_call_err(NULL, NULL, 0, NULL));
-	ft_lstiter(token_list, print);printf("\n");printf("[pipe_num: %d]\n", *pipe_num);
 	cmd_info_arr = init_cmd_info_arr(token_list, *pipe_num, &here_list, &err);
 	if (!cmd_info_arr)
 		return (sys_call_err(&token_list, NULL, 0, NULL));
-	printf("here: ");ft_lstiter(here_list, print);printf("\n");
 	tmp_list = here_doc(cmd_info_arr, *pipe_num, here_list, &err);
 	ft_lstclear(&here_list, ft_free);
 	if (err == SYN)
 		return (ft_syn_err(&token_list, &cmd_info_arr, *pipe_num, &tmp_list));
 	if (err == SYS)
-		return (sys_call_err(&token_list, &cmd_info_arr, *pipe_num, NULL));
-	printf("tmp: ");ft_lstiter(tmp_list, print);printf("\n");
+		return (sys_call_err(&token_list, &cmd_info_arr, *pipe_num, &tmp_list));
 	err = fill_cmd_info_arr(cmd_info_arr, token_list, tmp_list, env_lst);
 	if (err == SYN)
 		return (ft_syn_err(&token_list, &cmd_info_arr, *pipe_num, &tmp_list));
 	if (err == SYS)
 		return (sys_call_err(&token_list, &cmd_info_arr, *pipe_num, &tmp_list));
+	ft_clear_list(&token_list, &tmp_list);
 	print_cmd_arr(cmd_info_arr, *pipe_num);
 	return (cmd_info_arr);
 }
