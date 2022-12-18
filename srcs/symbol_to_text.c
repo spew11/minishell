@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   symbol_to_text.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/18 16:40:41 by root              #+#    #+#             */
+/*   Updated: 2022/12/18 17:25:46 by root             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "./parse.h"
 
 static char	*connect_list(t_list *list, int *err)
@@ -50,6 +62,7 @@ char	*replace_symbol_to_text(char *str, t_var_lst *env_lst, int *err)
 		return (NULL);
 	}
 	text = connect_list(text_list, err);
+	free(buff);
 	ft_lstclear(&text_list, ft_free);
 	return (text);
 }

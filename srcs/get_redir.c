@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_redir.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/18 16:32:01 by root              #+#    #+#             */
+/*   Updated: 2022/12/18 16:32:56 by root             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "./parse.h"
 
 int	get_redir(t_cmd_info *cmd_info_arr, t_list *cur_token, \
@@ -14,8 +26,7 @@ int	get_redir(t_cmd_info *cmd_info_arr, t_list *cur_token, \
 	return (err);
 }
 
-int	get_here_doc(t_cmd_info *cmd_info_arr, t_list *cur_token, \
-	int *idx, t_list **cur_tmp)
+int	get_here_doc(t_cmd_info *cmd_info_arr, int *idx, t_list **cur_tmp)
 {
 	char	*tmp_file;
 

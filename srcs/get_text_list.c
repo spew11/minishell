@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_text_list.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/18 16:34:25 by root              #+#    #+#             */
+/*   Updated: 2022/12/18 16:48:52 by root             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "./parse.h"
 
 static int	set_quote(int *quote, char ch)
@@ -33,7 +45,8 @@ static char	*expand_env(char *substr, int *str_i, t_var_lst *env_lst)
 	return (ft_strdup(""));
 }
 
-static int	env_to_list(t_list **text_list, char *str, int *str_i, t_var_lst *env_lst)
+static int	env_to_list(t_list **text_list, char *str, \
+			int *str_i, t_var_lst *env_lst)
 {
 	char	*env_str;
 	t_list	*new;
@@ -51,7 +64,7 @@ static int	env_to_list(t_list **text_list, char *str, int *str_i, t_var_lst *env
 	return (NONE);
 }
 
-static int	append_text(char **buff, int *buf_i, t_list **text_list, int *err)
+static int	add_buf(char **buff, int *buf_i, t_list **text_list, int *err)
 {
 	if (!buff_to_list(*buff, buf_i, text_list))
 	{
@@ -76,10 +89,10 @@ int	get_text_list(t_list **text_list, char *buff, char *str, t_var_lst *env_lst)
 	err = 0;
 	while (str[si])
 	{
-		if (!quote && is_quote(str[si]) && set_quote(&quote, str[si]) || \
+		if ((!quote && is_quote(str[si]) && set_quote(&quote, str[si])) || \
 			(quote == str[si] && set_quote(&quote, 0)))
-			append_text(&buff, &bi, text_list, &err);
-		else if (is_env(quote, str[si]) && append_text(&buff, &bi, text_list, &err))
+			add_buf(&buff, &bi, text_list, &err);
+		else if (is_env(quote, str[si]) && add_buf(&buff, &bi, text_list, &err))
 			err = env_to_list(text_list, str, &si, env_lst);
 		else if (err == NONE)
 			buff[bi++] = str[si];

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fill_cmd_info.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/18 16:31:46 by root              #+#    #+#             */
+/*   Updated: 2022/12/18 16:31:49 by root             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "./parse.h"
 
 static int	ft_err(int err)
@@ -44,6 +56,7 @@ int	get_type(char *str)
 		return (FILE_APPEND);
 	return (0);
 }
+
 // malloc_err -> -1
 // syntax_err -> 1
 // success -> 0
@@ -62,7 +75,7 @@ int	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *cur_token, \
 		else if (is_redir(cur_token -> content) && !is_syn_err(cur_token, &err))
 		{
 			if (get_type(cur_token->content) == HERE_DOC)
-				err = get_here_doc(cmd_info_arr, cur_token, idx, &cur_tmp);
+				err = get_here_doc(cmd_info_arr, idx, &cur_tmp);
 			else
 				err = get_redir(cmd_info_arr, cur_token, idx, env_lst);
 			cur_token = cur_token->next;

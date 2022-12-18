@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   malloc_cmd_info_arr.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/18 16:37:47 by root              #+#    #+#             */
+/*   Updated: 2022/12/18 16:37:47 by root             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "./parse.h"
 
 static void	init_para(int *p_cmd_i, int *cnt)
@@ -28,7 +40,7 @@ static int	check_redir_err(char *token, char **err_str)
 	return (0);
 }
 
-static int	append_here_list(t_cmd_info **cmd_info_arr, t_list **here_list, char *token)
+static int	append_here_list(t_list **here_list, char *token)
 {
 	char	*delim;
 	t_list	*new;
@@ -45,6 +57,7 @@ static int	append_here_list(t_cmd_info **cmd_info_arr, t_list **here_list, char 
 	ft_lstadd_back(here_list, new);
 	return (1);
 }
+
 // stntax_err -> err_str != NULL (but not malloc) return (0)
 // malloc_err -> return (0)
 // success -> return (1)
@@ -64,7 +77,7 @@ int	malloc_cmd_info_arr(t_cmd_info **cmd_info_arr, t_list *cur, \
 		{
 			if ((cur->next && check_redir_err(cur->next->content, err_str)) || \
 				(is_here(cur -> content) && cur->next && ++cnt[HERE] && \
-				!append_here_list(cmd_info_arr, here_list, cur->next->content)))
+				!append_here_list(here_list, cur->next->content)))
 				return (0);
 			if (++cnt[REDIR] && cur->next)
 				cur = cur -> next;

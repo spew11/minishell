@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   divide_line.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/18 16:31:06 by root              #+#    #+#             */
+/*   Updated: 2022/12/18 16:31:30 by root             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "./parse.h"
 
 static void	init_para(t_list **p_lst, int *num1, int *num2, int *num3)
@@ -12,7 +24,7 @@ static void	init_para(t_list **p_lst, int *num1, int *num2, int *num3)
 		*num3 = 0;
 }
 
-static int count_pipe(t_list *token_list)
+static int	count_pipe(t_list *token_list)
 {
 	t_list	*cur;
 	int		pipe_num;
@@ -77,6 +89,7 @@ static int	get_token_from_spl(t_list **token_list, char *str)
 	free(buff);
 	return (1);
 }
+
 // malloc_err -> NULL
 // succcess -> token_list
 t_list	*divide_line_into_token(char *line, int *pipe_num)

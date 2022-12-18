@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   init_cmd_info_arr.c                                :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/18 16:36:57 by root              #+#    #+#             */
+/*   Updated: 2022/12/18 16:36:57 by root             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "./parse.h"
 
 static void	token_err(char *str, int *syntax_err)
@@ -25,6 +37,7 @@ static void	init_cmd_info_val(t_cmd_info *cmd_info_arr, int pipe_num)
 		i++;
 	}
 }
+
 // malloc_err -> cmd_info == NULL
 // syntax_err -> cmd_info && syntax_err == 1
 // success -> cmd_info && syntax_err == 0

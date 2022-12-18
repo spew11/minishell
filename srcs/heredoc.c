@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heredoc.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/18 16:36:38 by root              #+#    #+#             */
+/*   Updated: 2022/12/18 17:44:30 by root             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "./parse.h"
 
 void	tmp_clear(t_list **tmp_list)
@@ -17,12 +29,16 @@ void	tmp_clear(t_list **tmp_list)
 static char	*get_tmp_name(void)
 {
 	static int	tmp_num;
-	char		tmp_name[10] = "tmp";
+	char		*tmp_num_str;
+	char		*tmp_name;
 
-	tmp_name[3] = tmp_num + '0';
-	tmp_name[4] = '\0';
-	tmp_num++;
-	return (ft_strjoin("./", tmp_name));
+	tmp_num_str = ft_itoa(tmp_num);
+	if (!tmp_num_str)
+		return (NULL);
+	tmp_num += 1;
+	tmp_name = ft_strjoin("/tmp/mini_tmp", tmp_num_str);
+	free(tmp_num_str);
+	return (tmp_name);
 }
 
 static int	append_str_to_list(t_list **list, char *str)
@@ -67,7 +83,7 @@ static char	*read_until_delim(char *delim)
 
 // malloc_err, system_call_err -> NULL
 // success -> tmp_list
-t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, int *err)
+t_list	*here_doc(t_list *here_list, int *err)
 {
 	char	*delim;	
 	char	*tmp_file;

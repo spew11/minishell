@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   split_by_space.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/18 16:40:29 by root              #+#    #+#             */
+/*   Updated: 2022/12/18 16:47:31 by root             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "./parse.h"
 
 static void	unclosed_quote_err(t_list **spl_list)
@@ -26,7 +38,7 @@ static int	is_space(char ch)
 	return (0);
 }
 
-static int	append_spl(t_list **spl_list, char *line, int start_i, int line_i)
+static int	add_spl(t_list **spl_list, char *line, int start_i, int line_i)
 {
 	char	*spl;
 	t_list	*new;
@@ -60,7 +72,7 @@ t_list	*split_by_space(char *line)
 	{
 		if (!quote_flag && is_space(line[line_i]))
 		{
-			if (start_i != line_i && !append_spl(&spl_list, line, start_i, line_i))
+			if (start_i != line_i && !add_spl(&spl_list, line, start_i, line_i))
 				return (NULL);
 			start_i = line_i + 1;
 		}
@@ -72,7 +84,7 @@ t_list	*split_by_space(char *line)
 	}
 	if (quote_flag)
 		unclosed_quote_err(&spl_list);
-	else if (start_i != line_i && !append_spl(&spl_list, line, start_i, line_i))
+	else if (start_i != line_i && !add_spl(&spl_list, line, start_i, line_i))
 		return (NULL);
 	return (spl_list);
 }
