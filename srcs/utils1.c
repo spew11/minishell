@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:55 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/16 16:54:03 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/18 16:54:40 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ char	**ft_slice(char *str, char sep)
 	return (strs);
 }
 
-static void	sig_handler(int signal)
+void	sig_handler(int signal)
 {
 	pid_t	pid;
 	int		status;

@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:45:53 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/16 16:57:41 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/18 16:54:53 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,4 +123,5 @@ void		wait_pids(pid_t *pid_arr, int pipe_num);
 void		unlink_tmpfiles(t_cmd_info *cmd_infos, int pipe_num);
 int			ft_access(const char *pathname);
 int			pid_err(void);
+void		sig_handler(int signal);
 #endif

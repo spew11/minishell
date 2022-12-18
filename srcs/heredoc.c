@@ -1,5 +1,6 @@
 #include "./parse.h"
-
+#include <signal.h>
+void	sig_handler(int signal);
 char	*get_tmp_name(void)
 {
 	static int	tmp_num;
@@ -21,7 +22,12 @@ int	append_str_to_list(t_list **list, char *str)
 	ft_lstadd_back(list, new);
 	return (1);
 }
-
+void sig_handler2(int sig_t) {
+	if (sig_t == SIGINT) {
+		close(0);
+	}
+	return ;
+}
 // success -> return file_name;
 // fail -> return NULL;
 char	*read_until_delim(char *delim, t_list **tmp_list)
@@ -62,6 +68,9 @@ t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, int *err)
 
 	tmp_list = NULL;
 	cur = here_list;
+	signal(SIGINT, sig_handler2);
+	int tmp;
+	tmp = dup(0);
 	while (cur)
 	{
 		delim = cur->content;
@@ -80,5 +89,7 @@ t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, int *err)
 		}
 		cur = cur->next;
 	}
+	dup2(tmp, 0);
+	signal(SIGINT, sig_handler);
 	return (tmp_list);
 }
