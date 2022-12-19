@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: woojeong <woojeong@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/18 16:36:38 by root              #+#    #+#             */
-/*   Updated: 2022/12/18 17:44:30 by root             ###   ########.fr       */
+/*   Updated: 2022/12/19 17:41:55 by woojeong         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,13 +52,46 @@ static int	append_str_to_list(t_list **list, char *str)
 	return (1);
 }
 
+void	sig_handler2(int sig_t)
+{
+	if (sig_t == SIGINT)
+	{
+		close(0);
+		g_exit_status = -1;
+	}
+}
+
+static int	write_tmp_file(char *delim, int tmp_fd, char **tmp_file)
+{
+	char	*line;
+
+	line = readline("> ");
+	if (g_exit_status == -1)
+	{
+		free(line);
+		free(*tmp_file);
+		*tmp_file = NULL;
+		return (0);
+	}
+	if (!line)
+		return (0);
+	if (!ft_strncmp(line, delim, ft_strlen(delim) + 1))
+	{
+		free(line);
+		return (0);
+	}
+	ft_putendl_fd(line, tmp_fd);
+	free(line);
+	return (1);
+}
+
 // success -> return file_name;
 // fail -> return NULL;
 static char	*read_until_delim(char *delim)
 {
-	char	*line;
 	char	*tmp_file;
 	int		tmp_fd;
+	int		stdin_fd;
 
 	tmp_file = get_tmp_name();
 	if (!tmp_file)
@@ -69,14 +102,13 @@ static char	*read_until_delim(char *delim)
 		free(tmp_file);
 		return (NULL);
 	}
-	while (1)
-	{
-		line = readline("mini_here> ");
-		if (!line || !ft_strncmp(line, delim, ft_strlen(delim) + 1))
-			break ;
-		ft_putendl_fd(line, tmp_fd);
-		free(line);
-	}
+	signal(SIGINT, sig_handler2);
+	stdin_fd = dup(0);
+	while (write_tmp_file(delim, tmp_fd, &tmp_file))
+		;
+	signal(SIGINT, sig_handler);
+	dup2(stdin_fd, 0);
+	close(stdin_fd);
 	close(tmp_fd);
 	return (tmp_file);
 }
@@ -101,7 +133,7 @@ t_list	*here_doc(t_list *here_list, int *err)
 			tmp_clear(&tmp_list);
 			*err = SYS;
 		}
-		if (!append_str_to_list(&tmp_list, tmp_file))
+		else if (!append_str_to_list(&tmp_list, tmp_file))
 		{
 			free(tmp_file);
 			tmp_clear(&tmp_list);
