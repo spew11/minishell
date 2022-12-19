@@ -1,36 +1,50 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <fcntl.h>
-#include "./libft.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/18 16:41:53 by root              #+#    #+#             */
+/*   Updated: 2022/12/18 16:45:55 by root             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#define INFILE		1 // '<'
-#define	HERE_DOC	2 // '<<'
-#define OUTFILE		3 // '>'
-#define FILE_APPEND 4 // '>>'
+#ifndef PARSE_H
+# define PARSE_H
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <string.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+# include <fcntl.h>
+# include "./libft.h"
+
+# define INFILE		1
+# define HERE_DOC	2
+# define OUTFILE		3
+# define FILE_APPEND 4
 
 typedef struct s_redir {
 	int		type;
 	char	*str;
-} t_redir;
+}	t_redir;
 
 typedef struct s_cmd_info {
 	int		argc;
 	char	**argv;
 	int		redir_num;
-	t_redir *redir;
+	t_redir	*redir;
 	int		here_num;
 	char	**here;
-} t_cmd_info;
+}	t_cmd_info;
 
 typedef struct s_var_lst {
-	char *var;
-	char *val;
-	struct s_var_lst *next;
-}				t_var_lst;
+	char				*var;
+	char				*val;
+	struct s_var_lst	*next;
+}	t_var_lst;
 
 enum	e_opt {
 	ARGC,
@@ -50,48 +64,37 @@ enum	e_err {
 	SYN = 1,
 };
 
-t_list *divide_line_into_token(char *line, int *pipe_num);
-t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, t_list **here_list, int *syntax_err);
-int	fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *token_list, t_list *tmp_list, t_var_lst *env_lst);
-t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, int *err);
-void	token_err(char *str, int *syntax_err);
-void	cmd_info_free(t_cmd_info **cmd_info_arr, int pipe_num);
+extern int	g_exit_status;
+
+t_list		*divide_line_into_token(char *line, int *pipe_num);
+t_cmd_info	*init_cmd_info_arr(t_list *token_list, int pipe_num, \
+		t_list **here_list, int *syntax_err);
+t_list		*here_doc(t_list *here_list, int *err);
+int			fill_cmd_info_arr(t_cmd_info *cmd_info_arr, t_list *cur_token, \
+		t_list *cur_tmp, t_var_lst *env_lst);
+t_list		*split_by_space(char *line);
+void		cmd_info_free(t_cmd_info **cmd_info_arr, int pipe_num);
+int			init_cmd_info(t_cmd_info **cmd_info, int cmd_i, int *cnt);
+int			malloc_cmd_info_arr(t_cmd_info **cmd_info_arr, t_list *cur, \
+		t_list **here_list, char **err_str);
+void		tmp_clear(t_list **tmp_list);
+int			is_pipe(char *token);
+int			is_redir(char *str);
+int			is_here(char *token);
+int			is_quote(char ch);
+int			is_env(int quote, char ch);
+void		ft_free(void *ptr);
+int			buff_free(char *buff);
+int			buff_to_list(char *buff, int *buf_i, t_list **list);
+int			get_redir(t_cmd_info *cmd_info_arr, t_list *cur_token, \
+		int *idx, t_var_lst *env_lst);
+int			get_here_doc(t_cmd_info *cmd_info_arr, int *idx, t_list **cur_tmp);
+int			get_type(char *str);
+int			get_text_list(t_list **text_list, char *buff, \
+		char *str, t_var_lst *env_lst);
+char		*replace_symbol_to_text(char *str, t_var_lst *env_lst, int *err);
+
 // temp
-int	is_pipe(char *token);
-void	ft_free(void *ptr);
-t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst);
-void print(void *ptr);
+void	print(void *ptr);
 void	print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num);
-t_var_lst *init_var_lst(char *envp[]);
-char *find_env(t_var_lst *env_lst, char *str);
-int	is_redir(char *str);
-int	buff_to_list(char *buff, int *buf_i, t_list **list);
-
-/*
-
-echo happy > out1 > out2
--> [ { 2, [ "echo", "happy" ], [ {OUTFILE, "out1"}, {OUTFILE, "out2"} ] ]
-
-cat < input | grep "hansu" > out
-->	[ 
-		[ 1, ["cat"],			[{INFILE, "input"}] ],
-		[ 2, ["grap, "hansu"],	[{OUTFILE, "out"}] ],
-	]
-
-cat < input | grep hansu | wc -l >> out
-->	[
-		[ 1, ["cat"],			 [{INFILE, "input"}] ],
-		[ 2, ["grep", "hansu"],	 NULL ],
-		[ 2, ["wc", "-l"],		 [{FILE_APPEND, "out"}]]
-	]
-
-cat < file1 > file2 << eof1 | cat -e >> out 
--> [
-		[ 1, ["cat"],		 [{INFILE, "file1"}, {OUTFILE, "file2"}, {HERE_DOC, "eof1"}] ],
-		[ 2, ["cat", "-e"],  [{FILE_APPEND, "out"}] ]	
-]
-
-*/
-
-// cat -b-n<out<$out -e|cat|cat -e>exp 
-// -> [cat, -b-n, <, out, <, $out, -e, |, cat, |, cat, -e, >, exp]
+#endif

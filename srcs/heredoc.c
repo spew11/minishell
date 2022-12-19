@@ -1,17 +1,47 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heredoc.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/18 16:36:38 by root              #+#    #+#             */
+/*   Updated: 2022/12/18 17:44:30 by root             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "./parse.h"
 
-char	*get_tmp_name(void)
+void	tmp_clear(t_list **tmp_list)
 {
-	static int	tmp_num;
-	char		tmp_name[10] = "tmp";
+	t_list	*cur;
 
-	tmp_name[3] = tmp_num + '0';
-	tmp_name[4] = '\0';
-	tmp_num++;
-	return (ft_strjoin("./", tmp_name));
+	cur = *tmp_list;
+	while (cur)
+	{
+		unlink(cur->content);
+		cur = cur->next;
+	}
+	ft_lstclear(tmp_list, ft_free);
+	*tmp_list = NULL;
 }
 
-int	append_str_to_list(t_list **list, char *str)
+static char	*get_tmp_name(void)
+{
+	static int	tmp_num;
+	char		*tmp_num_str;
+	char		*tmp_name;
+
+	tmp_num_str = ft_itoa(tmp_num);
+	if (!tmp_num_str)
+		return (NULL);
+	tmp_num += 1;
+	tmp_name = ft_strjoin("/tmp/mini_tmp", tmp_num_str);
+	free(tmp_num_str);
+	return (tmp_name);
+}
+
+static int	append_str_to_list(t_list **list, char *str)
 {
 	t_list	*new;
 
@@ -24,13 +54,13 @@ int	append_str_to_list(t_list **list, char *str)
 
 // success -> return file_name;
 // fail -> return NULL;
-char	*read_until_delim(char *delim, t_list **tmp_list)
+static char	*read_until_delim(char *delim)
 {
 	char	*line;
 	char	*tmp_file;
 	int		tmp_fd;
 
-	tmp_file = get_tmp_name(); // malloc
+	tmp_file = get_tmp_name();
 	if (!tmp_file)
 		return (NULL);
 	tmp_fd = open(tmp_file, O_WRONLY | O_CREAT, 00644);
@@ -53,32 +83,31 @@ char	*read_until_delim(char *delim, t_list **tmp_list)
 
 // malloc_err, system_call_err -> NULL
 // success -> tmp_list
-t_list	*here_doc(t_cmd_info *cmd_arr, int pipe_num, t_list *here_list, int *err)
+t_list	*here_doc(t_list *here_list, int *err)
 {
 	char	*delim;	
 	char	*tmp_file;
 	t_list	*tmp_list;
-	t_list	*cur;
+	t_list	*cur_here;
 
 	tmp_list = NULL;
-	cur = here_list;
-	while (cur)
+	cur_here = here_list;
+	while (cur_here && err != NONE)
 	{
-		delim = cur->content;
-		tmp_file = read_until_delim(delim, &tmp_list);
+		delim = cur_here->content;
+		tmp_file = read_until_delim(delim);
 		if (!tmp_file)
 		{
-			ft_lstclear(&tmp_list, ft_free);
+			tmp_clear(&tmp_list);
 			*err = SYS;
-			return (NULL);
 		}
 		if (!append_str_to_list(&tmp_list, tmp_file))
 		{
-			ft_lstclear(&tmp_list, ft_free);
+			free(tmp_file);
+			tmp_clear(&tmp_list);
 			*err = SYS;
-			return (NULL);
 		}
-		cur = cur->next;
+		cur_here = cur_here->next;
 	}
 	return (tmp_list);
 }
