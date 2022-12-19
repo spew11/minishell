@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_line.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: root <root@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: woojeong <woojeong@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/18 16:39:10 by root              #+#    #+#             */
-/*   Updated: 2022/12/18 17:21:35 by root             ###   ########.fr       */
+/*   Updated: 2022/12/19 17:48:29 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,10 @@ static void	ft_clear_list(t_list **token_list, t_list **tmp_list)
 static t_cmd_info	*sys_call_err(t_list **token_list, \
 			t_cmd_info **cmd_info_arr, int pipe_num, t_list **tmp_list)
 {
+	if (!token_list)
+		return (NULL);
 	perror("minishell");
+	g_exit_status = 1;
 	if (token_list)
 		ft_lstclear(token_list, ft_free);
 	if (cmd_info_arr)
@@ -34,6 +37,17 @@ static t_cmd_info	*sys_call_err(t_list **token_list, \
 static t_cmd_info	*ft_syn_err(t_list **token_list, \
 			t_cmd_info **cmd_info_arr, int pipe_num, t_list **tmp_list)
 {
+	g_exit_status = 258;
+	ft_lstclear(token_list, ft_free);
+	cmd_info_free(cmd_info_arr, pipe_num);
+	ft_lstclear(tmp_list, ft_free);
+	return (NULL);
+}
+
+static t_cmd_info	*sigint_exit(t_list **token_list, \
+			t_cmd_info **cmd_info_arr, int pipe_num, t_list **tmp_list)
+{
+	g_exit_status = 1;
 	ft_lstclear(token_list, ft_free);
 	cmd_info_free(cmd_info_arr, pipe_num);
 	ft_lstclear(tmp_list, ft_free);
@@ -56,16 +70,14 @@ t_cmd_info	*parse_line(char *line, int *pipe_num, t_var_lst *env_lst)
 		return (sys_call_err(&token_list, NULL, 0, NULL));
 	tmp_list = here_doc(here_list, &err);
 	ft_lstclear(&here_list, ft_free);
-	if (err == SYN)
-		return (ft_syn_err(&token_list, &cmd_info_arr, *pipe_num, &tmp_list));
-	if (err == SYS)
-		return (sys_call_err(&token_list, &cmd_info_arr, *pipe_num, &tmp_list));
-	err = fill_cmd_info_arr(cmd_info_arr, token_list, tmp_list, env_lst);
+	if (g_exit_status == (-5))
+		return (sigint_exit(&token_list, &cmd_info_arr, *pipe_num, &tmp_list));
+	if (err == NONE)
+		err = fill_cmd_info_arr(cmd_info_arr, token_list, tmp_list, env_lst);
 	if (err == SYN)
 		return (ft_syn_err(&token_list, &cmd_info_arr, *pipe_num, &tmp_list));
 	if (err == SYS)
 		return (sys_call_err(&token_list, &cmd_info_arr, *pipe_num, &tmp_list));
 	ft_clear_list(&token_list, &tmp_list);
-	print_cmd_arr(cmd_info_arr, *pipe_num);
 	return (cmd_info_arr);
 }

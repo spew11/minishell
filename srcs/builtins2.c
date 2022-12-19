@@ -25,17 +25,17 @@ static int	export_add_var(char *s, t_var_lst **env_lst, t_var_lst **export_lst)
 			return (1);
 		}
 		if (var_val[1] == 0)
-			var_val[1] = ft_strdup("\"\"");
+			var_val[1] = ft_strdup("");
 		if (!chk_var_name(var_val[0]))
 		{
 			add_var_lst(export_lst, var_val[0], var_val[1]);
-			add_var_lst(env_lst, var_val[0], var_val[1]);
+			add_var_lst(env_lst, ft_strdup(var_val[0]), ft_strdup(var_val[1]));
 		}
 		free(var_val);
 		return (0);
 	}
 	if (!chk_var_name(s))
-		add_var_lst(export_lst, s, 0);
+		add_var_lst(export_lst, ft_strdup(s), 0);
 	else
 		return (1);
 	return (0);

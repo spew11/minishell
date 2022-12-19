@@ -17,6 +17,16 @@ void	ft_free(void *ptr)
 	free(ptr);
 }
 
+void	sig_handler2(int sig_t)
+{
+	if (sig_t == SIGINT)
+	{
+		ft_putchar_fd('\n', 1);
+		close(0);
+		g_exit_status = (-5);
+	}
+}
+
 int	buff_to_list(char *buff, int *buf_i, t_list **list)
 {
 	char	*str;

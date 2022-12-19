@@ -63,7 +63,7 @@ char	**ft_slice(char *str, char sep)
 	return (strs);
 }
 
-static void	sig_handler(int sig_t)
+void	sig_handler(int sig_t)
 {
 	pid_t	pid;
 	int		status;

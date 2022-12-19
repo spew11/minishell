@@ -69,14 +69,16 @@ static char	*read_until_delim(char *delim)
 		free(tmp_file);
 		return (NULL);
 	}
-	while (1)
+	line = NULL;
+	while (g_exit_status != (-5))
 	{
-		line = readline("mini_here> ");
+		line = readline("> ");
 		if (!line || !ft_strncmp(line, delim, ft_strlen(delim) + 1))
 			break ;
 		ft_putendl_fd(line, tmp_fd);
 		free(line);
 	}
+	free(line);
 	close(tmp_fd);
 	return (tmp_file);
 }
@@ -89,25 +91,24 @@ t_list	*here_doc(t_list *here_list, int *err)
 	char	*tmp_file;
 	t_list	*tmp_list;
 	t_list	*cur_here;
+	int		stdin_fd;
 
 	tmp_list = NULL;
 	cur_here = here_list;
+	signal(SIGINT, sig_handler2);
+	stdin_fd = dup(0);
 	while (cur_here && err != NONE)
 	{
 		delim = cur_here->content;
 		tmp_file = read_until_delim(delim);
 		if (!tmp_file)
-		{
-			tmp_clear(&tmp_list);
-			*err = SYS;
-		}
+			tmp_err1(&tmp_list, err);
 		if (!append_str_to_list(&tmp_list, tmp_file))
-		{
-			free(tmp_file);
-			tmp_clear(&tmp_list);
-			*err = SYS;
-		}
+			tmp_err2(tmp_file, &tmp_list, err);
 		cur_here = cur_here->next;
 	}
+	signal(SIGINT, sig_handler);
+	dup2(stdin_fd, 0);
+	close(stdin_fd);
 	return (tmp_list);
 }

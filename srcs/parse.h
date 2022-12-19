@@ -19,12 +19,13 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <fcntl.h>
+# include <signal.h>
 # include "./libft.h"
 
-# define INFILE		1
-# define HERE_DOC	2
+# define INFILE			1
+# define HERE_DOC		2
 # define OUTFILE		3
-# define FILE_APPEND 4
+# define FILE_APPEND	4
 
 typedef struct s_redir {
 	int		type;
@@ -93,8 +94,8 @@ int			get_type(char *str);
 int			get_text_list(t_list **text_list, char *buff, \
 		char *str, t_var_lst *env_lst);
 char		*replace_symbol_to_text(char *str, t_var_lst *env_lst, int *err);
-
-// temp
-void	print(void *ptr);
-void	print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num);
+void		sig_handler(int signal);
+void		sig_handler2(int sig_t);
+void		tmp_err1(t_list **tmp_list, int *err);
+void		tmp_err2(char *tmp_file, t_list **tmp_list, int *err);
 #endif

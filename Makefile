@@ -33,15 +33,24 @@ MINISHELL = main.c \
 			var_lst1.c \
 			var_lst2.c \
 			var_lst3.c \
-			parse_line.c \
-			w_utils.c \
 			run_cmds1.c \
 			run_cmds2.c \
 			run_cmds3.c \
+			parse_line.c \
 			divide_line.c\
-			fill_cmd_info.c\
-			init_cmd_info.c\
-			heredoc.c
+			init_cmd_info.c \
+			fill_cmd_info.c \
+			heredoc.c \
+			get_redir.c \
+			get_text_list.c \
+			init_cmd_info_arr.c \
+			is_redir.c \
+			malloc_cmd_info_arr.c \
+			parse_free.c \
+			parse_utils.c \
+			split_by_space.c \
+			symbol_to_text.c \
+			tmp_err.c \
 
 SRCS = $(addprefix srcs/, $(MINISHELL))
 OBJS = $(SRCS:%.c=%.o)
