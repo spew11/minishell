@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:07:03 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/17 17:54:14 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/21 22:19:51 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,6 @@ int	exec_builtin(int argc, char *argv[],
 	if (ft_strncmp(argv[0], "env", -1) == 0)
 		return (env(argc, *env_lst));
 	if (ft_strncmp(argv[0], "exit", -1) == 0)
-		(ft_exit(argc));
+		(ft_exit(argc, argv));
 	return (1);
 }

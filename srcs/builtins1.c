@@ -6,48 +6,94 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:05 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/17 17:41:07 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/21 23:50:56 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_exit(int argc)
+static void	exit_err(char *str, int ret)
 {
+	ft_putendl_fd(str, 2);
+	exit(ret);
+	return ;
+}
+
+void	ft_exit(int argc, char *argv[])
+{
+	int	i;
+	int	argv_f;
+
+	argv_f = 1;
 	ft_putendl_fd("exit", 1);
-	if (argc > 1)
+	if (argc == 1)
+		exit(0);
+	i = -1;
+	while (argv[1][++i])
 	{
-		ft_putendl_fd("numeric argument required", 2);
-		exit(2);
+		if (!ft_isdigit(argv[1][i]))
+		{
+			argv_f = 0;
+			break;
+		}
 	}
-	exit(0);
+	if (argv_f)
+	{
+		if (argc == 2)
+			exit(ft_atoi(argv[1]));
+		else
+			exit_err("too many arguments", 1);
+	}
+	exit_err("numieric argument required", 2);
+	return ;
+}
+
+static void echo_opt(char *argv[], int *i, int *opt_f, int b_flag)
+{
+	int	j;
+
+	while (argv[++(*i)])
+	{
+		if (argv[*i][0] != '-')
+			break;
+		else
+		{
+			b_flag = 0;
+			j = 0;
+			while (argv[*i][++j])
+			{
+				if (argv[*i][j] != 'n')
+				{
+					b_flag = 1;
+					break;
+				}
+			}
+			if (b_flag == 1)
+				break;
+			*opt_f = 1;
+		}
+		if (b_flag == 1)
+			break;
+	}
 }
 
 int	echo(int argc, char *argv[])
 {
-	char	*str;
-	int		opt_f;
-	int		i;
+	int	opt_f;
+	int	i;
 
 	opt_f = 0;
-	i = 1;
-	if (argc > 1 && ft_strncmp(argv[1], "-n", 2) == 0)
-	{
-		opt_f = 1;
-		i++;
-	}
+	i = 0;
+	echo_opt(argv, &i, &opt_f, 0);
 	while (i < argc)
 	{
-		str = argv[i];
-		printf("%s", str);
+		printf("%s", argv[i]);
 		if (i < argc - 1)
 			printf(" ");
 		i++;
 	}
 	if (!opt_f)
-	{
 		printf("\n");
-	}
 	return (0);
 }
 
@@ -96,6 +142,8 @@ int	cd(int argc, char *argv[], t_var_lst *env_lst)
 		ft_putstr_fd("too many arguments\n", 2);
 		return (1);
 	}
+	if (argv[1][0] == '/')
+		chdir("/");
 	paths = ft_split(argv[1], '/');
 	ret = cd_to_path(home_path, paths);
 	free_double_arr(paths);

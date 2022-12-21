@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:45:53 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/17 17:44:00 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/21 22:19:18 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ int			unset(int argc, char *argv[],
 int			chk_var_name(char *var_name);
 void		var_name_err(void);
 char		**env_lst2arr(t_var_lst *env_lst);
-void		ft_exit(int argc);
+void		ft_exit(int argc, char *argv[]);
 int			is_builtin(char *cmd);
 int			exec_builtin(int argc, char *argv[],
 				t_var_lst **env_lst, t_var_lst **export_lst);
