@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:59 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/22 17:34:08 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/22 21:18:51 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,11 @@ static void	get_path2(char **pathname, char *argv[], t_var_lst *env_lst)
 	int		i;
 
 	paths = ft_split(ft_getenv(env_lst, "PATH"), ':');
+	if (!paths)
+	{
+		ft_putendl_fd("No such file or directory", 2);
+		exit(127);
+	}
 	i = -1;
 	while (paths[++i])
 	{
