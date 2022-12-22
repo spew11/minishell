@@ -6,15 +6,15 @@
 #    By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/09/05 21:09:19 by eunjilee          #+#    #+#              #
-#    Updated: 2022/12/22 15:49:39 by eunjilee         ###   ########.fr        #
+#    Updated: 2022/12/22 17:18:33 by eunjilee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 
-CC = gcc -I .
+CC = cc
 
-CCFLAGS = -Wall -Wextra -Werror
+CCFLAGS = -I . -Wall -Wextra -Werror
 
 CCFLAGS1 = -L /Users/eunjilee/.brew/opt/readline/lib -lreadline
 

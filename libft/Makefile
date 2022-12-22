@@ -6,13 +6,13 @@
 #    By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/15 20:13:44 by eunjilee          #+#    #+#              #
-#    Updated: 2022/03/28 19:42:57 by eunjilee         ###   ########.fr        #
+#    Updated: 2022/12/22 17:19:10 by eunjilee         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = libft.a
 
-CC = gcc
+CC = cc
 CCFLAGS = -Wall -Wextra -Werror
 
 LIBC = ar rc
