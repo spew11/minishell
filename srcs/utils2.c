@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:59 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/22 15:12:38 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/22 17:34:08 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ int	ft_execve(char *argv[], t_externs *externs)
 	char	*pathname;
 	char	**argv_arr;
 
+	signal(SIGQUIT, SIG_DFL);
 	pathname = 0;
 	argv_arr = ft_split(argv[0], '/');
 	if (externs->env_arr)
