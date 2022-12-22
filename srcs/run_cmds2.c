@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:44 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/17 17:55:55 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/22 17:08:31 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,9 @@ int	run_cmd(t_cmd_info *cmd_info, t_externs *externs)
 		}
 		else
 		{
+			signal(SIGQUIT, SIG_DFL);
 			ret = exec_binary(cmd_info, externs);
+			signal(SIGQUIT, SIG_IGN);
 		}
 	}
 	close(in_fd);

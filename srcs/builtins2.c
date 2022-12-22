@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:12 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/17 17:43:30 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/22 15:19:15 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,5 +87,14 @@ int	env(int argc, t_var_lst *env_lst)
 		return (1);
 	}
 	print_var_lst(env_lst);
+	return (0);
+}
+
+int	pwd(void)
+{
+	char	buf[4096];
+
+	getcwd(buf, 4096);
+	printf("%s\n", buf);
 	return (0);
 }

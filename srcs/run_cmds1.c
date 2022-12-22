@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:40 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/16 16:53:19 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/22 15:52:30 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,11 +74,7 @@ int	run_cmds(t_cmd_info *cmd_infos, int pipe_num, t_shell_info *shell_info)
 
 	shell_info->in_fd = -1;
 	shell_info->pid_arr = (int *)malloc(sizeof(int) * (pipe_num + 1));
-	if (shell_info->pid_arr < 0)
-	{
-		ft_putendl_fd(strerror(errno), 2);
-		return (-1);
-	}
+	null_guard_arr2(shell_info->pid_arr);
 	idx = 0;
 	while (idx <= pipe_num)
 	{

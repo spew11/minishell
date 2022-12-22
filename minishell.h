@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:45:53 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/21 22:19:18 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/22 15:49:50 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,4 +124,5 @@ void		unlink_tmpfiles(t_cmd_info *cmd_infos, int pipe_num);
 int			ft_access(const char *pathname);
 int			pid_err(void);
 void		cmd_info_free(t_cmd_info **cmd_info_arr, int pipe_num);
+void		null_guard_arr2(int *arr);
 #endif

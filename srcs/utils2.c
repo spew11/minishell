@@ -6,7 +6,7 @@
 /*   By: eunjilee <eunjilee@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/16 16:06:59 by eunjilee          #+#    #+#             */
-/*   Updated: 2022/12/22 02:22:17 by eunjilee         ###   ########.fr       */
+/*   Updated: 2022/12/22 15:12:38 by eunjilee         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,42 +27,53 @@ int	ft_access(const char *pathname)
 	return (-1);
 }
 
-int	ft_execve(char *argv[], t_externs *externs)
+static void	get_path1(char **pathname, char *argv[])
 {
-	char	*pathname;
-	char	**split_path = ft_split(argv[0], '/');
+	*pathname = argv[0];
+	if (ft_access(*pathname) == -1)
+	{
+		ft_putendl_fd("No such file or directory", 2);
+		exit(127);
+	}
+	return ;
+}
+
+static void	get_path2(char **pathname, char *argv[], t_var_lst *env_lst)
+{
+	char	**paths;
 	char	*tmp;
 	int		i;
 
+	paths = ft_split(ft_getenv(env_lst, "PATH"), ':');
+	i = -1;
+	while (paths[++i])
+	{
+		tmp = ft_strjoin(paths[i], "/");
+		if (*pathname)
+			free(*pathname);
+		*pathname = ft_strjoin(tmp, argv[0]);
+		free(tmp);
+		if (ft_access(*pathname) == 0)
+			return ;
+	}
+	return ;
+}
+
+int	ft_execve(char *argv[], t_externs *externs)
+{
+	char	*pathname;
+	char	**argv_arr;
+
+	pathname = 0;
+	argv_arr = ft_split(argv[0], '/');
 	if (externs->env_arr)
 		free_double_arr(externs->env_arr);
 	externs->env_arr = env_lst2arr(externs->env_lst);
-	if ((argv[0][0] == '/') ||
-		!ft_strncmp(split_path[0], ".", -1) ||
-		!ft_strncmp(split_path[0], "..", -1))
-	{
-		pathname = argv[0];
-		if (ft_access(pathname) == -1)
-		{
-			ft_putendl_fd("No such file or directory", 2);
-			exit(127);
-		}
-	}
+	if ((argv[0][0] == '/') || !ft_strncmp(argv_arr[0], ".", -1) ||
+		!ft_strncmp(argv_arr[0], "..", -1))
+		get_path1(&pathname, argv);
 	else
-	{
-		char	**paths = ft_split(ft_getenv(externs->env_lst, "PATH"), ':');
-		i = -1;
-		while (paths[++i])
-		{
-			tmp = ft_strjoin(paths[i], "/");
-			if (pathname)
-				free(pathname);
-			pathname = ft_strjoin(tmp, argv[0]);
-			free(tmp);
-			if (ft_access(pathname) == 0)
-				break ;
-		}
-	}
+		get_path2(&pathname, argv, externs->env_lst);
 	if (execve(pathname, argv, externs->env_arr) == -1)
 	{
 		ft_putendl_fd("command not found", 2);
