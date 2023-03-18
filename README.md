@@ -20,10 +20,7 @@ This repository has a program that provides essential features of the Bash shell
 
 ## Running this program locally
 ```bash
-git clone https://github.com/spew11/unix_pipe && \
-  cd unix_pipe && \
-  git submodule update --init && \
-  cd multi_pipe && \
+git https://github.com/spew11/minishell.git && \
   make
 ``` 
 --------------------
