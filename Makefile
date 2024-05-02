@@ -13,7 +13,7 @@
 all: build run
 
 build:
-	docker build -t minishell:latest ./minishell
+	docker build -t minishell:latest .
 
 run:
 	docker run -it --name minishell-container minishell:latest sh

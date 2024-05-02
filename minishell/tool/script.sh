@@ -1,3 +1,4 @@
-!#/bin/bash
+#!/bin/bash
 
 /root/minishell/minishell
+

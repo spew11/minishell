@@ -4,7 +4,7 @@ RUN apt update && apt install -y make && \
 apt install -y libreadline-dev && \
 apt install -y build-essential
 
-COPY . /root/minishell
+COPY minishell /root/minishell
 
 WORKDIR /root/minishell
 
