@@ -81,7 +81,7 @@ t_var_lst	*copy_lst(t_var_lst *var_lst);
 void		here_doc(t_cmd_info *cmd_arr, int pipe_num);
 void		print(void *ptr);
 void		print_cmd_arr(t_cmd_info *cmd_info_arr, int pipe_num);
-int			g_exit_status;
+extern int	g_exit_status;
 void		signal_on(void);
 void		chk_fork_err(int pid);
 void		chk_fd_err(int fd);
