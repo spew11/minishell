@@ -35,7 +35,7 @@ Linux BashShell의 핵심기능을 C언어로 구현한 프로젝트 입니다.
           - 내장함수 구현 </br>
           - 환경변수 자료구조 구현 </br>
           - Signal 구현 </br>
-          - docker 격리 </br>
+          - docker 이미지 구축 </br>
           </td>
           <td>
             - 명령어 구조 설계</br>
