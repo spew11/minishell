@@ -51,6 +51,7 @@ Linux BashShell의 핵심기능을 C언어로 구현한 프로젝트 입니다.
 <section>
 
 ## 서비스 화면
+![MINISHELL](https://github.com/spew11/minishell/assets/95565246/ce020cbc-7d1a-440d-82e7-aea5304a81f7)
 
 
 ## 실행 방법
