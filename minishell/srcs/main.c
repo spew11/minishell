@@ -12,6 +12,8 @@
 
 #include "minishell.h"
 
+int g_exit_status = 0;
+
 static void	get_eof(char *line)
 {
 	if (!line)
@@ -61,7 +63,7 @@ int	main(int argc, char *argv[], char *envp[])
 		ft_putendl_fd("too many arguments", 2);
 		return (1);
 	}
-	g_exit_status = 0;
+
 	init_term(&term);
 	init_shell_info(&shell_info, envp);
 	signal_on();
