@@ -13,16 +13,21 @@
 all: build run
 
 build:
-	docker build -t minishell:latest .
+	@docker build -t minishell:latest .
 
-run:
-	docker run -it --name minishell-container minishell:latest sh
-
+run: clean
+	@docker run -it --name minishell-container minishell:latest
 
 clean:
-	docker rm minishell-container
-	docker rmi -f minishell:latest
+	@if [ "$(shell docker ps -aq -f name=minishell-container)" ]; then \
+		docker rm minishell-container; \
+	fi
 
-re: clean all
+fclean: clean
+	@if [ "$(shell docker images -q minishell:latest)" ]; then \
+		docker rmi -f minishell:latest; \
+	fi
 
-.PHONY: all run build clean re
+re: fclean all
+
+.PHONY: all build run clean fclean re
